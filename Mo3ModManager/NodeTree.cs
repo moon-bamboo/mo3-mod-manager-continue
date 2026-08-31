@@ -49,23 +49,61 @@ namespace Mo3ModManager
             return nodes;
         }
 
-        private void BuildTree(List<Node> Nodes)
+        /// <summary>
+        /// Checks whether the given nodes could be merged into this tree without
+        /// conflicts (duplicate IDs, either against existing nodes or among
+        /// themselves; or parent references that cannot be resolved against
+        /// existing nodes or the batch itself).
+        /// This is a read-only check: it does not mutate this tree, nor does it
+        /// assign Parent/Childs on any Node instance (existing or new). This
+        /// matters because Node objects are shared by reference whenever a
+        /// NodeTree's contents are reused elsewhere (see ValidateNodes below),
+        /// so any mutation here would otherwise leak into that other context.
+        /// Throws if a conflict is found.
+        /// </summary>
+        private void ValidateNodesCanBeMerged(List<Node> Nodes)
         {
+            var idsInBatch = new HashSet<string>();
             foreach (var node in Nodes)
             {
                 if (NodesDictionary.ContainsKey(node.ID))
                 {
                     throw new Exception("Mod \"" + node.Name + "\" (" + node.Directory + ") has a duplicate ID \"" + node.ID + "\", which is already used by mod \"" + NodesDictionary[node.ID].Name + "\" (" + NodesDictionary[node.ID].Directory + "). Please check node.json of these mods.");
                 }
-                NodesDictionary[node.ID] = node;
+                if (!idsInBatch.Add(node.ID))
+                {
+                    throw new Exception("Mod \"" + node.Name + "\" (" + node.Directory + ") has a duplicate ID \"" + node.ID + "\", which is used by another mod in the same batch. Please check node.json of these mods.");
+                }
             }
-
 
             foreach (var node in Nodes)
             {
                 if (!node.IsRoot)
                 {
-                    if (!NodesDictionary.ContainsKey(node.ParentID)) throw new Exception("Mod \"" + node.Name + "\" (" + node.Directory + ") refers to a parent mod with ID \"" + node.ParentID + "\", but no such mod was found. Please check node.json of this mod.");
+                    if (!NodesDictionary.ContainsKey(node.ParentID) && !idsInBatch.Contains(node.ParentID))
+                    {
+                        throw new Exception("Mod \"" + node.Name + "\" (" + node.Directory + ") refers to a parent mod with ID \"" + node.ParentID + "\", but no such mod was found. Please check node.json of this mod.");
+                    }
+                }
+            }
+        }
+
+        private void BuildTree(List<Node> Nodes)
+        {
+            // Validate before mutating anything, so a conflict partway through
+            // the batch can never leave this tree (or any Node in it) in a
+            // partially-modified state.
+            this.ValidateNodesCanBeMerged(Nodes);
+
+            foreach (var node in Nodes)
+            {
+                NodesDictionary[node.ID] = node;
+            }
+
+            foreach (var node in Nodes)
+            {
+                if (!node.IsRoot)
+                {
                     node.Parent = NodesDictionary[node.ParentID];
                     node.Parent.Childs.Add(node);
                 }
@@ -84,12 +122,6 @@ namespace Mo3ModManager
             this.RootNodes = new List<Node>();
         }
 
-        public NodeTree(NodeTree NodeTree)
-        {
-            this.NodesDictionary = new Dictionary<string, Node>(NodeTree.NodesDictionary);
-            this.RootNodes = new List<Node>(NodeTree.RootNodes);
-        }
-
         public int Count() {
             return this.NodesDictionary.Count();
         }
@@ -98,6 +130,20 @@ namespace Mo3ModManager
         {
             var nodes = GetNodesFromDirectory(Directory);
             BuildTree(nodes);
+        }
+
+        /// <summary>
+        /// Checks whether the nodes found in the given directory could be added
+        /// to this tree without conflicts, without actually adding them and
+        /// without mutating this tree or any of its existing Node instances.
+        /// Returns the number of valid nodes found in the directory (0 if none).
+        /// Throws if a conflict is found (see ValidateNodesCanBeMerged).
+        /// </summary>
+        public int ValidateNodes(string Directory)
+        {
+            var nodes = GetNodesFromDirectory(Directory);
+            this.ValidateNodesCanBeMerged(nodes);
+            return nodes.Count;
         }
 
         public void RemoveNode(Node OldNode)

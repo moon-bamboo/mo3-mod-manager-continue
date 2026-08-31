@@ -409,12 +409,6 @@ namespace Mo3ModManager
             {
                 try
                 {
-                    NodeTree testTree = new NodeTree(this.NodeTree);
-
-                    //note that the elements are not copied
-                    //suspose let testTree.RootNodes[0].Childs[0].MainExecutable = ""
-                    //then this.NodeTree.RootNodes[0].Childs[0].MainExecutable=="" is true!
-                    //be careful
                     var fastZip = new ICSharpCode.SharpZipLib.Zip.FastZip();
 
                     // Will always overwrite if target filenames already exist
@@ -423,9 +417,12 @@ namespace Mo3ModManager
                         System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Incoming"),
                         String.Empty);
 
-                    testTree.AddNodes(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Incoming"));
+                    // Read-only check: verifies the archive's mods could be merged into
+                    // the current tree (no duplicate/unresolvable IDs) without actually
+                    // mutating this.NodeTree or any of its existing Node instances.
+                    int nodeCount = this.NodeTree.ValidateNodes(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Incoming"));
 
-                    if (testTree.Count() == this.NodeTree.Count()) throw new Exception("This archive doesn't contain any nodes.");
+                    if (nodeCount == 0) throw new Exception("This archive doesn't contain any nodes.");
 
                     IO.CreateHardLinksOfFiles(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Incoming"), System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Mods"));
 
