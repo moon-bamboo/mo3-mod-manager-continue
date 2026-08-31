@@ -10,6 +10,18 @@ namespace Mo3ModManager
     static class IO
     {
         /// <summary>
+        /// Replaces any character invalid in a Windows file/folder name with "_".
+        /// </summary>
+        public static string PurifyFileName(string Filename)
+        {
+            foreach (char c in System.IO.Path.GetInvalidFileNameChars())
+            {
+                Filename = Filename.Replace(c.ToString(), "_");
+            }
+            return Filename;
+        }
+
+        /// <summary>
         /// Delete everything in the directory.
         /// </summary>
         /// <param name="Directory">The directory to be cleared</param>

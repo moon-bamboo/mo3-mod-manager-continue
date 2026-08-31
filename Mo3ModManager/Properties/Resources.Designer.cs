@@ -313,5 +313,89 @@ namespace Mo3ModManager.Properties
                 return GetLocalizedString("RefreshButton_Text");
             }
         }
+
+        internal static string InstallWizard_Title {
+            get {
+                return GetLocalizedString("InstallWizard_Title");
+            }
+        }
+
+        internal static string InstallWizard_Intro {
+            get {
+                return GetLocalizedString("InstallWizard_Intro");
+            }
+        }
+
+        internal static string InstallWizard_FolderGroupHeader {
+            get {
+                return GetLocalizedString("InstallWizard_FolderGroupHeader");
+            }
+        }
+
+        internal static string InstallWizard_DetailsGroupHeader {
+            get {
+                return GetLocalizedString("InstallWizard_DetailsGroupHeader");
+            }
+        }
+
+        internal static string InstallWizard_NameLabel {
+            get {
+                return GetLocalizedString("InstallWizard_NameLabel");
+            }
+        }
+
+        internal static string InstallWizard_IdLabel {
+            get {
+                return GetLocalizedString("InstallWizard_IdLabel");
+            }
+        }
+
+        internal static string InstallWizard_MainExecutableLabel {
+            get {
+                return GetLocalizedString("InstallWizard_MainExecutableLabel");
+            }
+        }
+
+        internal static string InstallWizard_ArgumentsLabel {
+            get {
+                return GetLocalizedString("InstallWizard_ArgumentsLabel");
+            }
+        }
+
+        internal static string InstallWizard_ParentLabel {
+            get {
+                return GetLocalizedString("InstallWizard_ParentLabel");
+            }
+        }
+
+        internal static string InstallWizard_CompatibilityLabel {
+            get {
+                return GetLocalizedString("InstallWizard_CompatibilityLabel");
+            }
+        }
+
+        internal static string InstallWizard_NoParent {
+            get {
+                return GetLocalizedString("InstallWizard_NoParent");
+            }
+        }
+
+        internal static string InstallWizard_NameRequired {
+            get {
+                return GetLocalizedString("InstallWizard_NameRequired");
+            }
+        }
+
+        internal static string InstallWizard_IdRequired {
+            get {
+                return GetLocalizedString("InstallWizard_IdRequired");
+            }
+        }
+
+        internal static string InstallWizard_FolderRequired {
+            get {
+                return GetLocalizedString("InstallWizard_FolderRequired");
+            }
+        }
     }
 }

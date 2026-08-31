@@ -421,20 +421,10 @@ namespace Mo3ModManager
             }
         }
 
-        private string PurifyFileName(string Filename)
-        {
-            //replace invalid chars
-            foreach (char c in System.IO.Path.GetInvalidFileNameChars())
-            {
-                Filename = Filename.Replace(c.ToString(), "_");
-            }
-            return Filename;
-        }
-
         private void NewProfileButton_Click(object sender, RoutedEventArgs e)
         {
             string newProfileName = InputWindow.ShowDialog(this, Properties.Resources.NewProfile_Prompt, Properties.Resources.NewProfile_Caption);
-            newProfileName = this.PurifyFileName(newProfileName);
+            newProfileName = IO.PurifyFileName(newProfileName);
 
             if (String.IsNullOrWhiteSpace(newProfileName)) return;
 
@@ -461,7 +451,7 @@ namespace Mo3ModManager
 
 
             string newProfileName = InputWindow.ShowDialog(this, Properties.Resources.NewProfile_Prompt, Properties.Resources.NewProfile_Caption);
-            newProfileName = this.PurifyFileName(newProfileName);
+            newProfileName = IO.PurifyFileName(newProfileName);
 
             if (String.IsNullOrWhiteSpace(newProfileName)) return;
 
@@ -560,6 +550,7 @@ namespace Mo3ModManager
             };
             if ((bool)openFileDialog.ShowDialog())
             {
+                string incomingDirectory = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Incoming");
                 try
                 {
                     var fastZip = new ICSharpCode.SharpZipLib.Zip.FastZip();
@@ -567,17 +558,34 @@ namespace Mo3ModManager
                     // Will always overwrite if target filenames already exist
                     fastZip.ExtractZip(
                         openFileDialog.FileName,
-                        System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Incoming"),
+                        incomingDirectory,
                         String.Empty);
 
                     // Read-only check: verifies the archive's mods could be merged into
                     // the current tree (no duplicate/unresolvable IDs) without actually
                     // mutating this.NodeTree or any of its existing Node instances.
-                    int nodeCount = this.NodeTree.ValidateNodes(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Incoming"));
+                    int nodeCount = this.NodeTree.ValidateNodes(incomingDirectory);
 
-                    if (nodeCount == 0) throw new Exception("This archive doesn't contain any nodes.");
-
-                    IO.CreateHardLinksOfFiles(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Incoming"), System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Mods"));
+                    if (nodeCount > 0)
+                    {
+                        // The archive already follows this tool's convention
+                        // (top-level folder(s) each containing node.json + Files/):
+                        // install as-is, same as before.
+                        IO.CreateHardLinksOfFiles(incomingDirectory, System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Mods"));
+                    }
+                    else
+                    {
+                        // Most real-world mod archives were never packaged for this
+                        // tool specifically, so they won't have a node.json at all.
+                        // Let the user manually pick which folder's contents are the
+                        // mod's files and fill in the node.json fields by hand,
+                        // rather than just failing with "doesn't contain any nodes".
+                        if (!this.RunManualInstallWizard(incomingDirectory, openFileDialog.FileName))
+                        {
+                            // User cancelled the wizard: nothing was installed.
+                            return;
+                        }
+                    }
 
                     string modIDToRestore = this.GetSelectedModID();
                     this.suppressSelectionPersistence = true;
@@ -597,11 +605,70 @@ namespace Mo3ModManager
                 }
                 finally
                 {
-                    IO.ClearDirectory(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Incoming"));
+                    IO.ClearDirectory(incomingDirectory);
                 }
 
 
             }
+        }
+
+        /// <summary>
+        /// Shows the manual install wizard for an archive that doesn't already
+        /// contain a node.json, and (if the user confirms) creates the new mod
+        /// folder under Mods/ from the choices made in the wizard.
+        /// Returns true if a mod was installed, false if the user cancelled.
+        /// </summary>
+        private bool RunManualInstallWizard(string incomingDirectory, string archiveFileName)
+        {
+            string archiveDisplayName = System.IO.Path.GetFileNameWithoutExtension(archiveFileName);
+            var wizard = new InstallModWizard(this, incomingDirectory, archiveDisplayName, this.NodeTree.NodesDictionary.Values);
+            if (wizard.ShowDialog() != true)
+            {
+                return false;
+            }
+
+            string modsDirectory = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Mods");
+            string newModDirectory = this.CreateUniqueModDirectory(modsDirectory, wizard.ModName);
+
+            var node = new Node
+            {
+                ID = wizard.ModID,
+                Name = wizard.ModName,
+                MainExecutable = wizard.MainExecutable,
+                Arguments = wizard.Arguments,
+                ParentID = wizard.ParentID,
+                Compatibility = wizard.Compatibility
+            };
+
+            System.IO.Directory.CreateDirectory(System.IO.Path.Combine(newModDirectory, "Files"));
+            IO.CreateHardLinksOfFiles(wizard.SelectedFolderPath, System.IO.Path.Combine(newModDirectory, "Files"));
+            node.Write(newModDirectory);
+
+            return true;
+        }
+
+        /// <summary>
+        /// Picks a folder name for a new mod under Mods/, based on its name,
+        /// disambiguating with a numeric suffix if a folder with that name
+        /// already exists (e.g. because two different mods share a display
+        /// name, or a previous mod using that folder name was deleted and
+        /// re-installed). The folder name is purely a filesystem detail; the
+        /// mod's actual identity is its ID, stored in node.json.
+        /// </summary>
+        private string CreateUniqueModDirectory(string modsDirectory, string modName)
+        {
+            string baseName = IO.PurifyFileName(modName);
+            if (String.IsNullOrWhiteSpace(baseName)) baseName = "Mod";
+
+            string candidate = System.IO.Path.Combine(modsDirectory, baseName);
+            int suffix = 2;
+            while (System.IO.Directory.Exists(candidate))
+            {
+                candidate = System.IO.Path.Combine(modsDirectory, baseName + " (" + suffix + ")");
+                suffix++;
+            }
+            System.IO.Directory.CreateDirectory(candidate);
+            return candidate;
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

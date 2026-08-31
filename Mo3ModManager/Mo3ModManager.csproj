@@ -94,6 +94,7 @@
     <Compile Include="InputWindow.xaml.cs">
       <DependentUpon>InputWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="FolderTreeNode.cs" />
     <Compile Include="IO.cs" />
     <Compile Include="LocalizationManager.cs" />
     <Compile Include="ModProcessManager.cs" />
@@ -102,7 +103,14 @@
     <Compile Include="ProfileItem.cs" />
     <Compile Include="Win32.cs" />
     <Compile Include="ModItem.cs" />
+    <Compile Include="InstallModWizard.xaml.cs">
+      <DependentUpon>InstallModWizard.xaml</DependentUpon>
+    </Compile>
     <Page Include="InputWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="InstallModWizard.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

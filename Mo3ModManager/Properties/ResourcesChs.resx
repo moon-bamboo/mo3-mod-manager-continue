@@ -165,4 +165,46 @@
   <data name="RefreshButton_Text" xml:space="preserve">
     <value>刷新(_R)</value>
   </data>
+  <data name="InstallWizard_Title" xml:space="preserve">
+    <value>安装 Mod...</value>
+  </data>
+  <data name="InstallWizard_Intro" xml:space="preserve">
+    <value>该压缩包没有本工具所需的 node.json 配置文件。请选择哪个文件夹的内容作为此 Mod 的文件，并在下方填写详细信息。</value>
+  </data>
+  <data name="InstallWizard_FolderGroupHeader" xml:space="preserve">
+    <value>选择内容文件夹：</value>
+  </data>
+  <data name="InstallWizard_DetailsGroupHeader" xml:space="preserve">
+    <value>Mod 详细信息：</value>
+  </data>
+  <data name="InstallWizard_NameLabel" xml:space="preserve">
+    <value>名称：</value>
+  </data>
+  <data name="InstallWizard_IdLabel" xml:space="preserve">
+    <value>ID：</value>
+  </data>
+  <data name="InstallWizard_MainExecutableLabel" xml:space="preserve">
+    <value>主程序（可选，如果此 Mod 只是数据补丁可留空）：</value>
+  </data>
+  <data name="InstallWizard_ArgumentsLabel" xml:space="preserve">
+    <value>启动参数（可选）：</value>
+  </data>
+  <data name="InstallWizard_ParentLabel" xml:space="preserve">
+    <value>父 Mod（可选，选择此 Mod 所依赖的基础 Mod）：</value>
+  </data>
+  <data name="InstallWizard_CompatibilityLabel" xml:space="preserve">
+    <value>兼容模式（可选）：</value>
+  </data>
+  <data name="InstallWizard_NoParent" xml:space="preserve">
+    <value>（无 - 这是一个独立/基础 Mod）</value>
+  </data>
+  <data name="InstallWizard_NameRequired" xml:space="preserve">
+    <value>请输入此 Mod 的名称。</value>
+  </data>
+  <data name="InstallWizard_IdRequired" xml:space="preserve">
+    <value>请输入此 Mod 的 ID。</value>
+  </data>
+  <data name="InstallWizard_FolderRequired" xml:space="preserve">
+    <value>请选择哪个文件夹的内容作为此 Mod 的文件。</value>
+  </data>
 </root>

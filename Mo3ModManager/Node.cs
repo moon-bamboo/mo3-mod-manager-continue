@@ -127,5 +127,26 @@ namespace Mo3ModManager
 
         }
 
+        /// <summary>
+        /// Serializes this node's metadata to a "node.json" file in the given
+        /// directory, overwriting any existing file. Used by the manual install
+        /// wizard (to create a new mod) and by the rename feature (to update an
+        /// existing mod's name).
+        /// </summary>
+        public void Write(string Directory)
+        {
+            var raw_node = new
+            {
+                id = this.ID,
+                name = this.Name,
+                main_executable = this.MainExecutable,
+                arguments = this.Arguments,
+                parent = this.ParentID,
+                compatibility = this.Compatibility
+            };
+            string json = Newtonsoft.Json.JsonConvert.SerializeObject(raw_node, Newtonsoft.Json.Formatting.Indented);
+            System.IO.File.WriteAllText(System.IO.Path.Combine(Directory, "node.json"), json);
+        }
+
     }
 }

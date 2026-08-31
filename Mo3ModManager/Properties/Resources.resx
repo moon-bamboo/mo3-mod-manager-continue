@@ -224,4 +224,46 @@
   <data name="RefreshButton_Text" xml:space="preserve">
     <value>_Refresh</value>
   </data>
+  <data name="InstallWizard_Title" xml:space="preserve">
+    <value>Install Mod...</value>
+  </data>
+  <data name="InstallWizard_Intro" xml:space="preserve">
+    <value>This archive doesn't have a node.json for this mod manager. Select which folder's contents should become the mod's files, then fill in the details below.</value>
+  </data>
+  <data name="InstallWizard_FolderGroupHeader" xml:space="preserve">
+    <value>Select content folder:</value>
+  </data>
+  <data name="InstallWizard_DetailsGroupHeader" xml:space="preserve">
+    <value>Mod details:</value>
+  </data>
+  <data name="InstallWizard_NameLabel" xml:space="preserve">
+    <value>Name:</value>
+  </data>
+  <data name="InstallWizard_IdLabel" xml:space="preserve">
+    <value>ID:</value>
+  </data>
+  <data name="InstallWizard_MainExecutableLabel" xml:space="preserve">
+    <value>Main executable (optional, leave blank if this mod is data-only):</value>
+  </data>
+  <data name="InstallWizard_ArgumentsLabel" xml:space="preserve">
+    <value>Arguments (optional):</value>
+  </data>
+  <data name="InstallWizard_ParentLabel" xml:space="preserve">
+    <value>Parent mod (optional, choose the base mod this depends on):</value>
+  </data>
+  <data name="InstallWizard_CompatibilityLabel" xml:space="preserve">
+    <value>Compatibility mode (optional):</value>
+  </data>
+  <data name="InstallWizard_NoParent" xml:space="preserve">
+    <value>(None - this is a standalone/base mod)</value>
+  </data>
+  <data name="InstallWizard_NameRequired" xml:space="preserve">
+    <value>Please enter a name for this mod.</value>
+  </data>
+  <data name="InstallWizard_IdRequired" xml:space="preserve">
+    <value>Please enter an ID for this mod.</value>
+  </data>
+  <data name="InstallWizard_FolderRequired" xml:space="preserve">
+    <value>Please select which folder's contents should become the mod's files.</value>
+  </data>
 </root>
