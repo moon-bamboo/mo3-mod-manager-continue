@@ -198,7 +198,7 @@ namespace Mo3ModManager
 
         private void AboutButton_Click(object sender, RoutedEventArgs e)
         {
-            System.Diagnostics.Process.Start("https://go.mo3.club/mo3-mod-manager");
+            System.Diagnostics.Process.Start("https://github.com/moon-bamboo/mo3-mod-manager-continue");
         }
         // Note: the About link and author contact info above are intentionally left untranslated (product/contact identifiers).
 
