@@ -166,8 +166,13 @@ namespace Mo3ModManager
             // elements in the main visual tree). Look it up via the resource
             // key instead.
             var modContextMenu = (ContextMenu)this.Resources["ModItemContextMenu"];
-            var renameMenuItem = (MenuItem)modContextMenu.Items[0];
+            var openFolderMenuItem = (MenuItem)modContextMenu.Items[0];
+            openFolderMenuItem.Header = Properties.Resources.OpenModFolderMenuItem_Text;
+            // Items[1] is a Separator, not a MenuItem.
+            var renameMenuItem = (MenuItem)modContextMenu.Items[2];
             renameMenuItem.Header = Properties.Resources.RenameModMenuItem_Text;
+            var changeIdMenuItem = (MenuItem)modContextMenu.Items[3];
+            changeIdMenuItem.Header = Properties.Resources.ChangeModIdMenuItem_Text;
             // ToggleHideModMenuItem's text is set dynamically in
             // ModItemContextMenu_Opened (it depends on the selected mod's
             // hidden state), so it's intentionally not set here.
@@ -578,7 +583,7 @@ namespace Mo3ModManager
             // reachable via generated fields; look it up by resource key and
             // item index instead.
             var modContextMenu = (ContextMenu)sender;
-            var toggleHideMenuItem = (MenuItem)modContextMenu.Items[1];
+            var toggleHideMenuItem = (MenuItem)modContextMenu.Items[4];
 
             bool isHidden = this.DisplayState.IsHidden(selectedItem.Node.ID);
             toggleHideMenuItem.Header = isHidden ? Properties.Resources.UnhideModMenuItem_Text : Properties.Resources.HideModMenuItem_Text;
@@ -619,6 +624,21 @@ namespace Mo3ModManager
             }
         }
 
+        private void OpenModFolderMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedItem = this.ModTreeView.SelectedItem as ModItem;
+            if (selectedItem == null) return;
+
+            try
+            {
+                System.Diagnostics.Process.Start(selectedItem.Node.Directory);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, Properties.Resources.Dialog_Title_Error, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
         private void RenameModMenuItem_Click(object sender, RoutedEventArgs e)
         {
             var selectedItem = this.ModTreeView.SelectedItem as ModItem;
@@ -642,6 +662,70 @@ namespace Mo3ModManager
                 {
                     this.ModsGroupBox.Header = String.Format(Properties.Resources.ModsGroupBox_HeaderWithName, selectedItem.Title);
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, Properties.Resources.Dialog_Title_Error, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void ChangeModIdMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedItem = this.ModTreeView.SelectedItem as ModItem;
+            if (selectedItem == null) return;
+
+            string oldID = selectedItem.Node.ID;
+            string newID = InputWindow.ShowDialog(this, Properties.Resources.ChangeModId_Prompt, Properties.Resources.ChangeModId_Caption, oldID);
+            if (String.IsNullOrWhiteSpace(newID)) return;
+            newID = newID.Trim();
+
+            if (newID == oldID) return;
+
+            if (this.NodeTree.ContainsID(newID))
+            {
+                MessageBox.Show(String.Format(Properties.Resources.ModIdAlreadyExists, newID), Properties.Resources.Dialog_Title_Failure, MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            // Changing a mod's ID rewrites save-data folder names under every
+            // profile and the "parent" field of every direct child mod (see
+            // ModIdChanger for why); make sure the user understands the scope
+            // of this before proceeding, since it touches files outside this
+            // one mod's own folder.
+            if (MessageBox.Show(String.Format(Properties.Resources.ConfirmChangeModId, selectedItem.Name, oldID, newID), Properties.Resources.Dialog_Title_Warning, MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No) != MessageBoxResult.Yes)
+            {
+                return;
+            }
+
+            try
+            {
+                string profilesDirectory = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Profiles");
+                ModIdChanger.ChangeId(selectedItem.Node, newID, profilesDirectory);
+
+                // Keep NodeTree.NodesDictionary consistent with the Node's new
+                // ID (ModIdChanger mutates Node.ID in place but has no
+                // knowledge of NodeTree's dictionary keying).
+                this.NodeTree.ReKeyNode(oldID, selectedItem.Node);
+
+                // If this mod (or one of its now-updated children) was the
+                // "last selected mod" remembered in settings, that saved ID
+                // is now stale; refresh it so a restart doesn't silently fail
+                // to restore the selection.
+                if (Properties.Settings.Default.LastModID == oldID)
+                {
+                    Properties.Settings.Default.LastModID = newID;
+                    Properties.Settings.Default.Save();
+                }
+
+                // No tree structure changed (same parent/children, just a
+                // different ID), so update the UI in place rather than doing
+                // a full BuildTreeView().
+                if (selectedItem == this.ModTreeView.SelectedItem)
+                {
+                    this.UpdateRunButtonStatus();
+                }
+
+                MessageBox.Show(Properties.Resources.ChangeModIdSucceeded, Properties.Resources.Dialog_Title_Info, MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {

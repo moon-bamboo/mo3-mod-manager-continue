@@ -439,5 +439,53 @@ namespace Mo3ModManager.Properties
                 return GetLocalizedString("HiddenModSuffix");
             }
         }
+
+        internal static string Dialog_Title_Info {
+            get {
+                return GetLocalizedString("Dialog_Title_Info");
+            }
+        }
+
+        internal static string ChangeModIdMenuItem_Text {
+            get {
+                return GetLocalizedString("ChangeModIdMenuItem_Text");
+            }
+        }
+
+        internal static string ChangeModId_Prompt {
+            get {
+                return GetLocalizedString("ChangeModId_Prompt");
+            }
+        }
+
+        internal static string ChangeModId_Caption {
+            get {
+                return GetLocalizedString("ChangeModId_Caption");
+            }
+        }
+
+        internal static string ModIdAlreadyExists {
+            get {
+                return GetLocalizedString("ModIdAlreadyExists");
+            }
+        }
+
+        internal static string ConfirmChangeModId {
+            get {
+                return GetLocalizedString("ConfirmChangeModId");
+            }
+        }
+
+        internal static string ChangeModIdSucceeded {
+            get {
+                return GetLocalizedString("ChangeModIdSucceeded");
+            }
+        }
+
+        internal static string OpenModFolderMenuItem_Text {
+            get {
+                return GetLocalizedString("OpenModFolderMenuItem_Text");
+            }
+        }
     }
 }

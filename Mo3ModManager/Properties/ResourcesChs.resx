@@ -228,4 +228,30 @@
   <data name="HiddenModSuffix" xml:space="preserve">
     <value>(已隐藏)</value>
   </data>
+  <data name="Dialog_Title_Info" xml:space="preserve">
+    <value>提示</value>
+  </data>
+  <data name="ChangeModIdMenuItem_Text" xml:space="preserve">
+    <value>更改 ID...(_I)</value>
+  </data>
+  <data name="ChangeModId_Prompt" xml:space="preserve">
+    <value>Mod 的新 ID 是？（警告：此操作会影响所有配置下的存档数据，以及依赖此 Mod 的其他 Mod。请仅在你了解其影响的情况下修改。）</value>
+  </data>
+  <data name="ChangeModId_Caption" xml:space="preserve">
+    <value>更改 Mod ID...</value>
+  </data>
+  <data name="ModIdAlreadyExists" xml:space="preserve">
+    <value>ID "{0}" 已被另一个 Mod 使用，请选择一个不同的 ID。</value>
+  </data>
+  <data name="ConfirmChangeModId" xml:space="preserve">
+    <value>确定要将 Mod "{0}" 的 ID 从 "{1}" 改为 "{2}" 吗？
+
+此操作将重命名该 Mod 在每个配置下的存档文件夹，并更新所有以此 Mod 为父级的 Mod。此操作不易撤销，请仅在你了解其影响的情况下继续。</value>
+  </data>
+  <data name="ChangeModIdSucceeded" xml:space="preserve">
+    <value>Mod 的 ID 已成功更改。</value>
+  </data>
+  <data name="OpenModFolderMenuItem_Text" xml:space="preserve">
+    <value>打开所在目录...(_O)</value>
+  </data>
 </root>

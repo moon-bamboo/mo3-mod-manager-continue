@@ -26,10 +26,12 @@ namespace Mo3ModManager
             this.CancelButton.Content = Properties.Resources.InputWindow_Cancel;
         }
 
-        public static string ShowDialog(Window Owner,string Text,string Caption)
+        public static string ShowDialog(Window Owner, string Text, string Caption, string DefaultText = "")
         {
             var dialog = new InputWindow() { Owner = Owner, Title = Caption };
             dialog.TextBlock.Text = Text;
+            dialog.TextBox.Text = DefaultText;
+            dialog.TextBox.SelectAll();
             bool result = (bool) dialog.ShowDialog();
             return (result ? dialog.TextBox.Text : String.Empty);
         }

@@ -11,7 +11,10 @@
         <!-- Shared per-item context menu for mods in ModTreeView. Applied to
              every TreeViewItem via the ItemContainerStyle below. -->
         <ContextMenu x:Key="ModItemContextMenu" Opened="ModItemContextMenu_Opened">
+            <MenuItem x:Name="OpenModFolderMenuItem" Click="OpenModFolderMenuItem_Click" Header="_Open Containing Folder..." />
+            <Separator />
             <MenuItem x:Name="RenameModMenuItem" Click="RenameModMenuItem_Click" Header="_Rename..." />
+            <MenuItem x:Name="ChangeModIdMenuItem" Click="ChangeModIdMenuItem_Click" Header="Change _ID..." />
             <MenuItem x:Name="ToggleHideModMenuItem" Click="ToggleHideModMenuItem_Click" Header="_Hide" />
         </ContextMenu>
     </Window.Resources>

@@ -287,4 +287,30 @@
   <data name="HiddenModSuffix" xml:space="preserve">
     <value>(hidden)</value>
   </data>
+  <data name="Dialog_Title_Info" xml:space="preserve">
+    <value>Info</value>
+  </data>
+  <data name="ChangeModIdMenuItem_Text" xml:space="preserve">
+    <value>Change _ID...</value>
+  </data>
+  <data name="ChangeModId_Prompt" xml:space="preserve">
+    <value>What is the mod's new ID? (Warning: this affects all profiles' save data and any mods that depend on this one. Only change this if you know what you're doing.)</value>
+  </data>
+  <data name="ChangeModId_Caption" xml:space="preserve">
+    <value>Change Mod ID...</value>
+  </data>
+  <data name="ModIdAlreadyExists" xml:space="preserve">
+    <value>ID "{0}" is already used by another mod. Please choose a different ID.</value>
+  </data>
+  <data name="ConfirmChangeModId" xml:space="preserve">
+    <value>Are you sure you want to change the ID of mod "{0}" from "{1}" to "{2}"?
+
+This will rename this mod's save-data folder under every profile, and update every mod that has this one as its parent. This cannot be easily undone. Only proceed if you know what you're doing.</value>
+  </data>
+  <data name="ChangeModIdSucceeded" xml:space="preserve">
+    <value>The mod's ID was changed successfully.</value>
+  </data>
+  <data name="OpenModFolderMenuItem_Text" xml:space="preserve">
+    <value>_Open Containing Folder...</value>
+  </data>
 </root>

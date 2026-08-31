@@ -146,6 +146,30 @@ namespace Mo3ModManager
             return nodes.Count;
         }
 
+        /// <summary>
+        /// Whether a mod with the given ID already exists in this tree.
+        /// Used by the "change ID" feature to reject a new ID that would
+        /// collide with another already-installed mod, before attempting
+        /// any filesystem changes.
+        /// </summary>
+        public bool ContainsID(string ID)
+        {
+            return this.NodesDictionary.ContainsKey(ID);
+        }
+
+        /// <summary>
+        /// Re-keys NodesDictionary after a Node's ID has been changed
+        /// in-place (see ModIdChanger). NodesDictionary is keyed by ID, so
+        /// simply mutating Node.ID would otherwise leave the dictionary
+        /// pointing at the old key while the Node object itself reports a
+        /// new one, making lookups by the new ID silently fail.
+        /// </summary>
+        public void ReKeyNode(string OldID, Node Node)
+        {
+            this.NodesDictionary.Remove(OldID);
+            this.NodesDictionary[Node.ID] = Node;
+        }
+
         public void RemoveNode(Node OldNode)
         {
             //only leaf node is allowed to be removed
