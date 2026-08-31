@@ -21,6 +21,9 @@ namespace Mo3ModManager
         public InputWindow()
         {
             InitializeComponent();
+
+            this.OKButton.Content = Properties.Resources.InputWindow_OK;
+            this.CancelButton.Content = Properties.Resources.InputWindow_Cancel;
         }
 
         public static string ShowDialog(Window Owner,string Text,string Caption)

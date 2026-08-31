@@ -94,6 +94,7 @@
       <DependentUpon>InputWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="IO.cs" />
+    <Compile Include="LocalizationManager.cs" />
     <Compile Include="ModProcessManager.cs" />
     <Compile Include="ModProcessManagerArguments.cs" />
     <Compile Include="NodeTree.cs" />
@@ -136,9 +137,11 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Include="Properties\ResourcesChs.resx" />
     <None Include="app.manifest">
       <SubType>Designer</SubType>
     </None>
+    <None Include="App.config" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

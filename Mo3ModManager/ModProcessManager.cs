@@ -362,9 +362,9 @@ namespace Mo3ModManager
                 else
                 {
                     //continue
-                    System.Windows.MessageBox.Show(parent, "You are still running Windows 7 or earlier.\n It's too old so we can't know whether the game has exited or not.\n Click the OK button when the game has exited.",
-                   "You should consider upgrading to Windows 10", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Exclamation);
-                    System.Windows.MessageBox.Show(parent, "Only click the OK button when the game has exited.", "Double check",
+                    System.Windows.MessageBox.Show(parent, Properties.Resources.LegacyOS_Warning1,
+                   Properties.Resources.LegacyOS_WarningTitle1, System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Exclamation);
+                    System.Windows.MessageBox.Show(parent, Properties.Resources.LegacyOS_DoubleCheckMessage, Properties.Resources.LegacyOS_DoubleCheckTitle,
                         System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Exclamation);
 
                     // notice for dumbs
@@ -389,7 +389,7 @@ namespace Mo3ModManager
 
                             if (this.RunningDirectory.Contains(exePath))
                             {
-                                System.Windows.MessageBox.Show(parent, "Only click the OK button when the game has exited.", "Double check",
+                                System.Windows.MessageBox.Show(parent, Properties.Resources.LegacyOS_DoubleCheckMessage, Properties.Resources.LegacyOS_DoubleCheckTitle,
                                 System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Exclamation);
                                 break;
                             }

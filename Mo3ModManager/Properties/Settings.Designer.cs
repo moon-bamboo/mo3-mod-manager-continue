@@ -24,5 +24,21 @@ namespace Mo3ModManager.Properties
                 return defaultInstance;
             }
         }
+
+        /// <summary>
+        /// The manually selected UI language (two-letter ISO code, e.g. "en" or "zh").
+        /// Empty string means "follow the system UI language" (auto-detect).
+        /// </summary>
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string Language {
+            get {
+                return ((string)(this["Language"]));
+            }
+            set {
+                this["Language"] = value;
+            }
+        }
     }
 }

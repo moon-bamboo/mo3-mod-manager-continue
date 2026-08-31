@@ -25,6 +25,8 @@ namespace Mo3ModManager
         {
             this.InitializeComponent();
 
+            this.ApplyLocalizedText();
+
             this.Title += " v" + System.Diagnostics.FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly().Location).FileVersion;
 
             try
@@ -35,9 +37,29 @@ namespace Mo3ModManager
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(ex.Message, Properties.Resources.Dialog_Title_Error, MessageBoxButton.OK, MessageBoxImage.Error);
                 Environment.Exit(1);
             }
+        }
+
+        /// <summary>
+        /// Applies localized text to UI elements that x:Static cannot bind to
+        /// (the strongly-typed Resources properties are generated as internal,
+        /// so x:Static markup extension cannot access them via reflection).
+        /// </summary>
+        private void ApplyLocalizedText()
+        {
+            this.Title = Properties.Resources.MainWindow_Title;
+            this.RunButtonText.Text = Properties.Resources.RunButton_Text;
+            this.InstallModButtonText.Text = Properties.Resources.InstallModButton_Text;
+            this.DeleteModButtonText.Text = Properties.Resources.DeleteModButton_Text;
+            this.NewProfileButtonText.Text = Properties.Resources.NewProfileButton_Text;
+            this.RenameProfileButtonText.Text = Properties.Resources.RenameProfileButton_Text;
+            this.DeleteProfileButtonText.Text = Properties.Resources.DeleteProfileButton_Text;
+            this.AboutButtonText.Text = Properties.Resources.AboutButton_Text;
+            this.LanguageButtonText.Text = Properties.Resources.LanguageButton_Text;
+            this.ProfilesGroupBox.Header = Properties.Resources.ProfilesGroupBox_HeaderNoSelection;
+            this.ModsGroupBox.Header = Properties.Resources.ModsGroupBox_HeaderNoSelection;
         }
 
         private bool isCloseButtonEnabled = true;
@@ -58,6 +80,59 @@ namespace Mo3ModManager
         private void AboutButton_Click(object sender, RoutedEventArgs e)
         {
             System.Diagnostics.Process.Start("https://go.mo3.club/mo3-mod-manager");
+        }
+        // Note: the About link and author contact info above are intentionally left untranslated (product/contact identifiers).
+
+        private void LanguageButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.LanguageContextMenu.Items.Clear();
+
+            // When opened programmatically (IsOpen = true) rather than via
+            // right-click, WPF does not automatically anchor the menu to the
+            // clicked control, so it would otherwise appear at (0,0). Set the
+            // placement target explicitly so it opens right below the button.
+            this.LanguageContextMenu.PlacementTarget = this.LanguageButton;
+
+            string currentLanguage = LocalizationManager.CurrentLanguage;
+
+            var autoItem = new MenuItem
+            {
+                Header = Properties.Resources.LanguageMenu_Auto,
+                IsCheckable = true,
+                IsChecked = (currentLanguage == null)
+            };
+            autoItem.Click += (s, args) => this.SwitchLanguage(null);
+            this.LanguageContextMenu.Items.Add(autoItem);
+
+            this.LanguageContextMenu.Items.Add(new Separator());
+
+            foreach (var languageCode in LocalizationManager.SupportedLanguages)
+            {
+                var menuItem = new MenuItem
+                {
+                    Header = LocalizationManager.GetDisplayName(languageCode),
+                    IsCheckable = true,
+                    IsChecked = (currentLanguage == languageCode),
+                    Tag = languageCode
+                };
+                menuItem.Click += (s, args) => this.SwitchLanguage((string)((MenuItem)s).Tag);
+                this.LanguageContextMenu.Items.Add(menuItem);
+            }
+
+            this.LanguageContextMenu.IsOpen = true;
+        }
+
+        private void SwitchLanguage(string languageCode)
+        {
+            LocalizationManager.ApplyLanguage(languageCode);
+            LocalizationManager.SaveLanguagePreference(languageCode);
+
+            // Refresh all localized text currently shown, including dynamic
+            // headers/content that depend on the current selection.
+            this.ApplyLocalizedText();
+            this.Title += " v" + System.Diagnostics.FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly().Location).FileVersion;
+            this.ModTreeView_SelectedItemChanged(this, null);
+            this.On_ProgProfilesListView_SelectionChanged();
         }
 
         private void BuildProfiles()
@@ -97,13 +172,13 @@ namespace Mo3ModManager
             if (this.ModTreeView.SelectedItem != null)
             {
                 var selectedItem = this.ModTreeView.SelectedItem as ModItem;
-                this.ModsGroupBox.Header = "Mod: " + selectedItem.Title;
+                this.ModsGroupBox.Header = String.Format(Properties.Resources.ModsGroupBox_HeaderWithName, selectedItem.Title);
 
                 this.DeleteModButton.IsEnabled = (selectedItem.Items.Count == 0);
             }
             else
             {
-                this.ModsGroupBox.Header = "Mods:";
+                this.ModsGroupBox.Header = Properties.Resources.ModsGroupBox_HeaderNoSelection;
 
                 this.DeleteModButton.IsEnabled = false;
             }
@@ -115,14 +190,14 @@ namespace Mo3ModManager
             if (this.ProfilesListView.SelectedItem != null)
             {
                 var selectedItem = this.ProfilesListView.SelectedItem as ProfileItem;
-                this.ProfilesGroupBox.Header = "Profile: " + selectedItem.Name;
+                this.ProfilesGroupBox.Header = String.Format(Properties.Resources.ProfilesGroupBox_HeaderWithName, selectedItem.Name);
 
                 this.RenameProfileButton.IsEnabled = true;
                 this.DeleteProfileButton.IsEnabled = true;
             }
             else
             {
-                this.ProfilesGroupBox.Header = "Profiles:";
+                this.ProfilesGroupBox.Header = Properties.Resources.ProfilesGroupBox_HeaderNoSelection;
 
                 this.RenameProfileButton.IsEnabled = false;
                 this.DeleteProfileButton.IsEnabled = false;
@@ -168,7 +243,7 @@ namespace Mo3ModManager
 
                  {
                      System.Diagnostics.Trace.WriteLine("[Error] " + worker_e.Error.Message);
-                     MessageBox.Show(worker_e.Error.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                     MessageBox.Show(worker_e.Error.Message, Properties.Resources.Dialog_Title_Error, MessageBoxButton.OK, MessageBoxImage.Error);
                  }
 
                  this.BuildProfiles();
@@ -205,7 +280,7 @@ namespace Mo3ModManager
 
         private void NewProfileButton_Click(object sender, RoutedEventArgs e)
         {
-            string newProfileName = InputWindow.ShowDialog(this, "What is the new profile's name?", "New Profile...");
+            string newProfileName = InputWindow.ShowDialog(this, Properties.Resources.NewProfile_Prompt, Properties.Resources.NewProfile_Caption);
             newProfileName = this.PurifyFileName(newProfileName);
 
             if (String.IsNullOrWhiteSpace(newProfileName)) return;
@@ -215,14 +290,14 @@ namespace Mo3ModManager
             {
                 if (System.IO.Directory.Exists(newProfilePath))
                 {
-                    MessageBox.Show("Profile \"" + newProfileName + "\" already existed. Try another.", "Failure", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show(String.Format(Properties.Resources.ProfileAlreadyExists, newProfileName), Properties.Resources.Dialog_Title_Failure, MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
                 var directoryInfo = System.IO.Directory.CreateDirectory(newProfilePath);
                 this.ProfilesListView.Items.Add(new ProfileItem(directoryInfo));
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(ex.Message, Properties.Resources.Dialog_Title_Error, MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -232,7 +307,7 @@ namespace Mo3ModManager
             var selectedItem = (this.ProfilesListView.SelectedItem as ProfileItem);
 
 
-            string newProfileName = InputWindow.ShowDialog(this, "What is the new profile's name?", "New Profile...");
+            string newProfileName = InputWindow.ShowDialog(this, Properties.Resources.NewProfile_Prompt, Properties.Resources.NewProfile_Caption);
             newProfileName = this.PurifyFileName(newProfileName);
 
             if (String.IsNullOrWhiteSpace(newProfileName)) return;
@@ -243,7 +318,7 @@ namespace Mo3ModManager
             {
                 if (System.IO.Directory.Exists(newProfilePath))
                 {
-                    MessageBox.Show("Profile \"" + newProfileName + "\" already existed. Try another.", "Failure", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show(String.Format(Properties.Resources.ProfileAlreadyExists, newProfileName), Properties.Resources.Dialog_Title_Failure, MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
                 System.IO.Directory.Move(selectedItem.Directory, newProfilePath);
                 selectedItem.ReplaceFrom(new ProfileItem(new System.IO.DirectoryInfo(newProfilePath)));
@@ -251,7 +326,7 @@ namespace Mo3ModManager
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(ex.Message, Properties.Resources.Dialog_Title_Error, MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
         }
@@ -259,7 +334,7 @@ namespace Mo3ModManager
         {
             System.Diagnostics.Debug.Assert(this.ProfilesListView.SelectedItem != null);
             var selectedItem = this.ProfilesListView.SelectedItem as ProfileItem;
-            if (MessageBox.Show("Are you sure to delete \"" + selectedItem.Name + "\" profile?", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No) == MessageBoxResult.Yes)
+            if (MessageBox.Show(String.Format(Properties.Resources.ConfirmDeleteProfile, selectedItem.Name), Properties.Resources.Dialog_Title_Warning, MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No) == MessageBoxResult.Yes)
             {
                 try
                 {
@@ -268,7 +343,7 @@ namespace Mo3ModManager
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(ex.Message, Properties.Resources.Dialog_Title_Error, MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
@@ -282,18 +357,23 @@ namespace Mo3ModManager
 
         private void AboutButton_MouseEnter(object sender, MouseEventArgs e)
         {
-            this.AboutButton.Content = new AccessText() { Text = "By: S_ad Pencil <me@pencil.live>..." };
+            // Mutate the existing AccessText's Text property rather than
+            // replacing Button.Content with a new instance. Replacing the
+            // instance would detach it from the "AboutButtonText" field used
+            // by ApplyLocalizedText, causing language switches to silently
+            // stop affecting this button until the next hover.
+            this.AboutButtonText.Text = Properties.Resources.AboutButton_HoverText;
         }
 
         private void AboutButton_MouseLeave(object sender, MouseEventArgs e)
         {
-            this.AboutButton.Content = new AccessText() { Text = "_About..." };
+            this.AboutButtonText.Text = Properties.Resources.AboutButton_Text;
         }
 
         private void DeleteModButton_Click(object sender, RoutedEventArgs e)
         {
             var selectedItem = this.ModTreeView.SelectedItem as ModItem;
-            if (MessageBox.Show("Are you sure to delete \"" + selectedItem.Name + "\" mod?", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No) == MessageBoxResult.Yes)
+            if (MessageBox.Show(String.Format(Properties.Resources.ConfirmDeleteMod, selectedItem.Name), Properties.Resources.Dialog_Title_Warning, MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No) == MessageBoxResult.Yes)
             {
                 try
                 {
@@ -312,7 +392,7 @@ namespace Mo3ModManager
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(ex.Message, Properties.Resources.Dialog_Title_Error, MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
 
@@ -322,8 +402,8 @@ namespace Mo3ModManager
         {
             var openFileDialog = new Microsoft.Win32.OpenFileDialog()
             {
-                Filter = "Mod Archive (*.zip)|*.zip",
-                Title = "Install Mod..."
+                Filter = Properties.Resources.InstallMod_FileFilter,
+                Title = Properties.Resources.InstallMod_DialogTitle
             };
             if ((bool)openFileDialog.ShowDialog())
             {
@@ -353,7 +433,7 @@ namespace Mo3ModManager
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(ex.Message, Properties.Resources.Dialog_Title_Error, MessageBoxButton.OK, MessageBoxImage.Error);
                 }
                 finally
                 {
@@ -368,7 +448,7 @@ namespace Mo3ModManager
         {
             if (!this.IsEnabled)
             {
-                var result = System.Windows.MessageBox.Show(this, "Only close Mod Manager when the game has exited, otherwise you will lose your game data. Click \"Yes\" if you do want to exit now.", "Warning",
+                var result = System.Windows.MessageBox.Show(this, Properties.Resources.ConfirmCloseWhileRunning, Properties.Resources.Dialog_Title_Warning,
                 System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Exclamation);
                 if (result != MessageBoxResult.Yes)
                 {

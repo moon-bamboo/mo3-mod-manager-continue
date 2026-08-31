@@ -1,64 +1,5 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
-  <!-- 
-    Microsoft ResX Schema 
-    
-    Version 2.0
-    
-    The primary goals of this format is to allow a simple XML format 
-    that is mostly human readable. The generation and parsing of the 
-    various data types are done through the TypeConverter classes 
-    associated with the data types.
-    
-    Example:
-    
-    ... ado.net/XML headers & schema ...
-    <resheader name="resmimetype">text/microsoft-resx</resheader>
-    <resheader name="version">2.0</resheader>
-    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
-    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
-    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
-    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
-    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
-        <value>[base64 mime encoded serialized .NET Framework object]</value>
-    </data>
-    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
-        <comment>This is a comment</comment>
-    </data>
-                
-    There are any number of "resheader" rows that contain simple 
-    name/value pairs.
-    
-    Each data row contains a name, and value. The row also contains a 
-    type or mimetype. Type corresponds to a .NET class that support 
-    text/value conversion through the TypeConverter architecture. 
-    Classes that don't support this are serialized and stored with the 
-    mimetype set.
-    
-    The mimetype is used for serialized objects, and tells the 
-    ResXResourceReader how to depersist the object. This is currently not 
-    extensible. For a given mimetype the value must be set accordingly:
-    
-    Note - application/x-microsoft.net.object.binary.base64 is the format 
-    that the ResXResourceWriter will generate, however the reader can 
-    read any of the formats listed below.
-    
-    mimetype: application/x-microsoft.net.object.binary.base64
-    value   : The object must be serialized with 
-            : System.Serialization.Formatters.Binary.BinaryFormatter
-            : and then encoded with base64 encoding.
-    
-    mimetype: application/x-microsoft.net.object.soap.base64
-    value   : The object must be serialized with 
-            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
-            : and then encoded with base64 encoding.
-
-    mimetype: application/x-microsoft.net.object.bytearray.base64
-    value   : The object must be serialized into a byte array 
-            : using a System.ComponentModel.TypeConverter
-            : and then encoded with base64 encoding.
-    -->
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -115,107 +56,107 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="MainWindow_Title" xml:space="preserve">
-    <value>Mental Omega Mod Manager</value>
+    <value>心灵终结 Mod 管理器</value>
   </data>
   <data name="RunButton_Text" xml:space="preserve">
-    <value>_Play</value>
+    <value>运行(_P)</value>
   </data>
   <data name="InstallModButton_Text" xml:space="preserve">
-    <value>_Install Mod...</value>
+    <value>安装 Mod...(_I)</value>
   </data>
   <data name="DeleteModButton_Text" xml:space="preserve">
-    <value>_Delete Mod...</value>
+    <value>删除 Mod...(_D)</value>
   </data>
   <data name="NewProfileButton_Text" xml:space="preserve">
-    <value>_New Profile...</value>
+    <value>新建配置...(_N)</value>
   </data>
   <data name="RenameProfileButton_Text" xml:space="preserve">
-    <value>_Rename Profile...</value>
+    <value>重命名配置...(_R)</value>
   </data>
   <data name="DeleteProfileButton_Text" xml:space="preserve">
-    <value>D_elete Profile...</value>
+    <value>删除配置...(_E)</value>
   </data>
   <data name="AboutButton_Text" xml:space="preserve">
-    <value>_About...</value>
+    <value>关于...(_A)</value>
   </data>
   <data name="AboutButton_HoverText" xml:space="preserve">
-    <value>By: S_ad Pencil &lt;me@pencil.live&gt;...</value>
+    <value>作者：Sad Pencil &lt;me@pencil.live&gt;...(_A)</value>
   </data>
   <data name="ProfilesGroupBox_Header" xml:space="preserve">
-    <value>Profiles</value>
+    <value>配置列表</value>
   </data>
   <data name="ProfilesGroupBox_HeaderWithName" xml:space="preserve">
-    <value>Profile: {0}</value>
+    <value>配置：{0}</value>
   </data>
   <data name="ProfilesGroupBox_HeaderNoSelection" xml:space="preserve">
-    <value>Profiles:</value>
+    <value>配置列表：</value>
   </data>
   <data name="ModsGroupBox_Header" xml:space="preserve">
-    <value>Mods</value>
+    <value>Mod 列表</value>
   </data>
   <data name="ModsGroupBox_HeaderWithName" xml:space="preserve">
-    <value>Mod: {0}</value>
+    <value>Mod：{0}</value>
   </data>
   <data name="ModsGroupBox_HeaderNoSelection" xml:space="preserve">
-    <value>Mods:</value>
-  </data>
-  <data name="InstallMod_FileFilter" xml:space="preserve">
-    <value>Mod Archive (*.zip)|*.zip</value>
-  </data>
-  <data name="InstallMod_DialogTitle" xml:space="preserve">
-    <value>Install Mod...</value>
+    <value>Mod 列表：</value>
   </data>
   <data name="Dialog_Title_Error" xml:space="preserve">
-    <value>Error</value>
+    <value>错误</value>
   </data>
   <data name="Dialog_Title_Warning" xml:space="preserve">
-    <value>Warning</value>
+    <value>警告</value>
   </data>
   <data name="Dialog_Title_Failure" xml:space="preserve">
-    <value>Failure</value>
+    <value>失败</value>
   </data>
   <data name="NewProfile_Prompt" xml:space="preserve">
-    <value>What is the new profile's name?</value>
+    <value>新配置的名称是？</value>
   </data>
   <data name="NewProfile_Caption" xml:space="preserve">
-    <value>New Profile...</value>
+    <value>新建配置...</value>
   </data>
   <data name="ProfileAlreadyExists" xml:space="preserve">
-    <value>Profile "{0}" already existed. Try another.</value>
+    <value>配置 "{0}" 已存在，请换一个名称。</value>
   </data>
   <data name="ConfirmDeleteProfile" xml:space="preserve">
-    <value>Are you sure to delete "{0}" profile?</value>
+    <value>确定要删除配置 "{0}" 吗？</value>
   </data>
   <data name="ConfirmDeleteMod" xml:space="preserve">
-    <value>Are you sure to delete "{0}" mod?</value>
+    <value>确定要删除 Mod "{0}" 吗？</value>
   </data>
   <data name="ConfirmCloseWhileRunning" xml:space="preserve">
-    <value>Only close Mod Manager when the game has exited, otherwise you will lose your game data. Click "Yes" if you do want to exit now.</value>
+    <value>只有在游戏退出后才能关闭 Mod 管理器，否则你的游戏数据将会丢失。如果确实要现在退出，请点击"是"。</value>
   </data>
   <data name="InputWindow_OK" xml:space="preserve">
-    <value>OK</value>
+    <value>确定</value>
   </data>
   <data name="InputWindow_Cancel" xml:space="preserve">
-    <value>Cancel</value>
+    <value>取消</value>
   </data>
   <data name="LegacyOS_Warning1" xml:space="preserve">
-    <value>You are still running Windows 7 or earlier.
- It's too old so we can't know whether the game has exited or not.
- Click the OK button when the game has exited.</value>
+    <value>你正在使用 Windows 7 或更早的系统。
+ 由于系统过旧，我们无法判断游戏是否已经退出。
+ 请在游戏退出后点击"确定"按钮。</value>
   </data>
   <data name="LegacyOS_WarningTitle1" xml:space="preserve">
-    <value>You should consider upgrading to Windows 10</value>
+    <value>建议升级到 Windows 10</value>
   </data>
   <data name="LegacyOS_DoubleCheckMessage" xml:space="preserve">
-    <value>Only click the OK button when the game has exited.</value>
+    <value>请只在游戏退出后点击"确定"按钮。</value>
   </data>
   <data name="LegacyOS_DoubleCheckTitle" xml:space="preserve">
-    <value>Double check</value>
+    <value>再次确认</value>
+  </data>
+  <data name="InstallMod_FileFilter" xml:space="preserve">
+    <value>Mod 压缩包 (*.zip)|*.zip</value>
+  </data>
+  <data name="InstallMod_DialogTitle" xml:space="preserve">
+    <value>安装 Mod...</value>
   </data>
   <data name="LanguageButton_Text" xml:space="preserve">
-    <value>_Language...</value>
+    <value>语言...(_L)</value>
   </data>
   <data name="LanguageMenu_Auto" xml:space="preserve">
-    <value>Follow System Language</value>
+    <value>跟随系统语言</value>
   </data>
 </root>

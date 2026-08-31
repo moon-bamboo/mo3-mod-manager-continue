@@ -18,30 +18,36 @@
 
                 <StackPanel x:Name="icon" Grid.Column="2" >
                     <Button x:Name="RunButton"  Click="RunButton_Click" IsEnabled="False" >
-                        <AccessText>_Play</AccessText>
+                        <AccessText x:Name="RunButtonText">_Play</AccessText>
                     </Button>
                     <!--<Button x:Name="PropertiesButton" IsEnabled="False">Properties...</Button>-->
                     <!--<Button x:Name="BrowseButton" Click="BrowseButton_Click">Browse...</Button> -->
                     
                     <Button x:Name="InstallModButton" Click="InstallModButton_Click"  >
-                        <AccessText>_Install Mod...</AccessText>
+                        <AccessText x:Name="InstallModButtonText">_Install Mod...</AccessText>
                     </Button>
                     <Button x:Name="DeleteModButton" IsEnabled="False" Click="DeleteModButton_Click">
-                        <AccessText>_Delete Mod...</AccessText>
+                        <AccessText x:Name="DeleteModButtonText">_Delete Mod...</AccessText>
                     </Button>
                     
                     
                     <Button x:Name="NewProfileButton" Click="NewProfileButton_Click" >
-                        <AccessText>_New Profile...</AccessText>
+                        <AccessText x:Name="NewProfileButtonText">_New Profile...</AccessText>
                     </Button>
                     <Button x:Name="RenameProfileButton" IsEnabled="False" Click="RenameProfileButton_Click">
-                        <AccessText>_Rename Profile...</AccessText>
+                        <AccessText x:Name="RenameProfileButtonText">_Rename Profile...</AccessText>
                     </Button>
                     <Button x:Name="DeleteProfileButton" Click="DeleteProfileButton_Click" IsEnabled="False" >
-                        <AccessText>D_elete Profile...</AccessText>
+                        <AccessText x:Name="DeleteProfileButtonText">D_elete Profile...</AccessText>
                     </Button>
                     <Button x:Name="AboutButton" MouseEnter="AboutButton_MouseEnter" MouseLeave="AboutButton_MouseLeave" Click="AboutButton_Click" >
-                        <AccessText>_About...</AccessText>
+                        <AccessText x:Name="AboutButtonText">_About...</AccessText>
+                    </Button>
+                    <Button x:Name="LanguageButton" Click="LanguageButton_Click" >
+                        <AccessText x:Name="LanguageButtonText">_Language...</AccessText>
+                        <Button.ContextMenu>
+                            <ContextMenu x:Name="LanguageContextMenu" Placement="Bottom" />
+                        </Button.ContextMenu>
                     </Button>
                 </StackPanel>
 

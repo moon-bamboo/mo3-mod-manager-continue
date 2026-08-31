@@ -27,6 +27,8 @@ namespace Mo3ModManager.Properties
 
         private static global::System.Resources.ResourceManager resourceMan;
 
+        private static global::System.Resources.ResourceManager resourceManChs;
+
         private static global::System.Globalization.CultureInfo resourceCulture;
 
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
@@ -35,7 +37,7 @@ namespace Mo3ModManager.Properties
         }
 
         /// <summary>
-        ///   返回此类使用的缓存 ResourceManager 实例。
+        ///   返回此类使用的缓存 ResourceManager 实例（英文/默认资源）。
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
         internal static global::System.Resources.ResourceManager ResourceManager {
@@ -50,6 +52,24 @@ namespace Mo3ModManager.Properties
         }
 
         /// <summary>
+        ///   返回简体中文资源的 ResourceManager 实例。
+        ///   注意：本地化资源没有使用 .NET 内置的卫星程序集(satellite assembly)机制，
+        ///   而是把中文字符串直接以独立资源名(ResourcesChs)嵌入主程序集，
+        ///   运行时根据 CurrentUICulture 手动选择使用哪一份资源。
+        ///   这样做是为了避免编译时依赖 Windows SDK 的 al.exe(卫星程序集生成工具)。
+        /// </summary>
+        private static global::System.Resources.ResourceManager ResourceManagerChs {
+            get {
+                if ((resourceManChs == null))
+                {
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Mo3ModManager.Properties.ResourcesChs", typeof(Resources).Assembly);
+                    resourceManChs = temp;
+                }
+                return resourceManChs;
+            }
+        }
+
+        /// <summary>
         ///   覆盖当前线程的 CurrentUICulture 属性
         ///   使用此强类型的资源类的资源查找。
         /// </summary>
@@ -60,6 +80,225 @@ namespace Mo3ModManager.Properties
             }
             set {
                 resourceCulture = value;
+            }
+        }
+
+        /// <summary>
+        ///   根据当前 UI 文化(Culture)选择合适的资源字符串。
+        ///   若 Culture 显式设置了值，则以此为准；否则使用系统当前 UI 文化(CurrentUICulture)。
+        ///   简体中文("zh")使用中文资源，其余语言回退到英文默认资源。
+        /// </summary>
+        private static string GetLocalizedString(string name)
+        {
+            var culture = resourceCulture ?? global::System.Globalization.CultureInfo.CurrentUICulture;
+            if (culture != null && culture.TwoLetterISOLanguageName == "zh")
+            {
+                return ResourceManagerChs.GetString(name, resourceCulture);
+            }
+            return ResourceManager.GetString(name, resourceCulture);
+        }
+
+        internal static string MainWindow_Title {
+            get {
+                return GetLocalizedString("MainWindow_Title");
+            }
+        }
+
+        internal static string RunButton_Text {
+            get {
+                return GetLocalizedString("RunButton_Text");
+            }
+        }
+
+        internal static string InstallModButton_Text {
+            get {
+                return GetLocalizedString("InstallModButton_Text");
+            }
+        }
+
+        internal static string DeleteModButton_Text {
+            get {
+                return GetLocalizedString("DeleteModButton_Text");
+            }
+        }
+
+        internal static string NewProfileButton_Text {
+            get {
+                return GetLocalizedString("NewProfileButton_Text");
+            }
+        }
+
+        internal static string RenameProfileButton_Text {
+            get {
+                return GetLocalizedString("RenameProfileButton_Text");
+            }
+        }
+
+        internal static string DeleteProfileButton_Text {
+            get {
+                return GetLocalizedString("DeleteProfileButton_Text");
+            }
+        }
+
+        internal static string AboutButton_Text {
+            get {
+                return GetLocalizedString("AboutButton_Text");
+            }
+        }
+
+        internal static string AboutButton_HoverText {
+            get {
+                return GetLocalizedString("AboutButton_HoverText");
+            }
+        }
+
+        internal static string ProfilesGroupBox_Header {
+            get {
+                return GetLocalizedString("ProfilesGroupBox_Header");
+            }
+        }
+
+        internal static string ProfilesGroupBox_HeaderWithName {
+            get {
+                return GetLocalizedString("ProfilesGroupBox_HeaderWithName");
+            }
+        }
+
+        internal static string ModsGroupBox_Header {
+            get {
+                return GetLocalizedString("ModsGroupBox_Header");
+            }
+        }
+
+        internal static string ModsGroupBox_HeaderWithName {
+            get {
+                return GetLocalizedString("ModsGroupBox_HeaderWithName");
+            }
+        }
+
+        internal static string ProfilesGroupBox_HeaderNoSelection {
+            get {
+                return GetLocalizedString("ProfilesGroupBox_HeaderNoSelection");
+            }
+        }
+
+        internal static string ModsGroupBox_HeaderNoSelection {
+            get {
+                return GetLocalizedString("ModsGroupBox_HeaderNoSelection");
+            }
+        }
+
+        internal static string InstallMod_FileFilter {
+            get {
+                return GetLocalizedString("InstallMod_FileFilter");
+            }
+        }
+
+        internal static string InstallMod_DialogTitle {
+            get {
+                return GetLocalizedString("InstallMod_DialogTitle");
+            }
+        }
+
+        internal static string Dialog_Title_Error {
+            get {
+                return GetLocalizedString("Dialog_Title_Error");
+            }
+        }
+
+        internal static string Dialog_Title_Warning {
+            get {
+                return GetLocalizedString("Dialog_Title_Warning");
+            }
+        }
+
+        internal static string Dialog_Title_Failure {
+            get {
+                return GetLocalizedString("Dialog_Title_Failure");
+            }
+        }
+
+        internal static string NewProfile_Prompt {
+            get {
+                return GetLocalizedString("NewProfile_Prompt");
+            }
+        }
+
+        internal static string NewProfile_Caption {
+            get {
+                return GetLocalizedString("NewProfile_Caption");
+            }
+        }
+
+        internal static string ProfileAlreadyExists {
+            get {
+                return GetLocalizedString("ProfileAlreadyExists");
+            }
+        }
+
+        internal static string ConfirmDeleteProfile {
+            get {
+                return GetLocalizedString("ConfirmDeleteProfile");
+            }
+        }
+
+        internal static string ConfirmDeleteMod {
+            get {
+                return GetLocalizedString("ConfirmDeleteMod");
+            }
+        }
+
+        internal static string ConfirmCloseWhileRunning {
+            get {
+                return GetLocalizedString("ConfirmCloseWhileRunning");
+            }
+        }
+
+        internal static string InputWindow_OK {
+            get {
+                return GetLocalizedString("InputWindow_OK");
+            }
+        }
+
+        internal static string InputWindow_Cancel {
+            get {
+                return GetLocalizedString("InputWindow_Cancel");
+            }
+        }
+
+        internal static string LegacyOS_Warning1 {
+            get {
+                return GetLocalizedString("LegacyOS_Warning1");
+            }
+        }
+
+        internal static string LegacyOS_WarningTitle1 {
+            get {
+                return GetLocalizedString("LegacyOS_WarningTitle1");
+            }
+        }
+
+        internal static string LegacyOS_DoubleCheckMessage {
+            get {
+                return GetLocalizedString("LegacyOS_DoubleCheckMessage");
+            }
+        }
+
+        internal static string LegacyOS_DoubleCheckTitle {
+            get {
+                return GetLocalizedString("LegacyOS_DoubleCheckTitle");
+            }
+        }
+
+        internal static string LanguageButton_Text {
+            get {
+                return GetLocalizedString("LanguageButton_Text");
+            }
+        }
+
+        internal static string LanguageMenu_Auto {
+            get {
+                return GetLocalizedString("LanguageMenu_Auto");
             }
         }
     }
