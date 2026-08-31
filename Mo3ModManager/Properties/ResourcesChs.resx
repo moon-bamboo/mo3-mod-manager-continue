@@ -159,4 +159,10 @@
   <data name="LanguageMenu_Auto" xml:space="preserve">
     <value>跟随系统语言</value>
   </data>
+  <data name="AnotherInstanceRunning" xml:space="preserve">
+    <value>Mod 管理器的另一个实例正在运行。同一时间只能运行一个实例。</value>
+  </data>
+  <data name="RefreshButton_Text" xml:space="preserve">
+    <value>刷新(_R)</value>
+  </data>
 </root>

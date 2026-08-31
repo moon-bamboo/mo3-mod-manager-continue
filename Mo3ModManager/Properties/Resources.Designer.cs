@@ -301,5 +301,17 @@ namespace Mo3ModManager.Properties
                 return GetLocalizedString("LanguageMenu_Auto");
             }
         }
+
+        internal static string AnotherInstanceRunning {
+            get {
+                return GetLocalizedString("AnotherInstanceRunning");
+            }
+        }
+
+        internal static string RefreshButton_Text {
+            get {
+                return GetLocalizedString("RefreshButton_Text");
+            }
+        }
     }
 }

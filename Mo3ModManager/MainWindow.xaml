@@ -29,7 +29,9 @@
                     <Button x:Name="DeleteModButton" IsEnabled="False" Click="DeleteModButton_Click">
                         <AccessText x:Name="DeleteModButtonText">_Delete Mod...</AccessText>
                     </Button>
-                    
+                    <Button x:Name="RefreshButton" Click="RefreshButton_Click" >
+                        <AccessText x:Name="RefreshButtonText">_Refresh</AccessText>
+                    </Button>
                     
                     <Button x:Name="NewProfileButton" Click="NewProfileButton_Click" >
                         <AccessText x:Name="NewProfileButtonText">_New Profile...</AccessText>
@@ -80,10 +82,14 @@
                         </HierarchicalDataTemplate>
                     </TreeView.ItemTemplate>
 
-                    <!--Expanded by default-->
+                    <!--Expanded by default. IsSelected is bound two-way so that
+                         setting ModItem.IsSelected in code (e.g. to restore the
+                         last-used mod after a rebuild) selects the corresponding
+                         TreeViewItem, since TreeView.SelectedItem itself is read-only.-->
                     <TreeView.ItemContainerStyle>
                         <Style TargetType="{x:Type TreeViewItem}">
                             <Setter Property="IsExpanded" Value="True" />
+                            <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
                         </Style>
                     </TreeView.ItemContainerStyle>
 

@@ -218,4 +218,10 @@
   <data name="LanguageMenu_Auto" xml:space="preserve">
     <value>Follow System Language</value>
   </data>
+  <data name="AnotherInstanceRunning" xml:space="preserve">
+    <value>Another instance of Mod Manager is already running. Only one instance can run at a time.</value>
+  </data>
+  <data name="RefreshButton_Text" xml:space="preserve">
+    <value>_Refresh</value>
+  </data>
 </root>

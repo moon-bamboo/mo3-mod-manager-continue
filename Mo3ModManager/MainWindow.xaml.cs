@@ -21,6 +21,15 @@ namespace Mo3ModManager
     {
         NodeTree NodeTree;
 
+        // Suppresses persisting the current selection to user settings while
+        // we are programmatically restoring a previously-saved selection (as
+        // opposed to the user actually clicking something). Without this, the
+        // transient "nothing selected" state that occurs while rebuilding the
+        // list (Items.Clear() before re-adding items) would overwrite the
+        // saved preference, and re-applying a saved preference would count as
+        // a fresh "last selection" write, which is harmless but unnecessary.
+        private bool suppressSelectionPersistence = false;
+
         public MainWindow()
         {
             this.InitializeComponent();
@@ -31,15 +40,104 @@ namespace Mo3ModManager
 
             try
             {
+                this.suppressSelectionPersistence = true;
+
                 this.BuildTreeView();
+                this.SelectModByID(Properties.Settings.Default.LastModID);
 
                 this.BuildProfiles();
+                this.SelectDefaultOrLastProfile(Properties.Settings.Default.LastProfileName);
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, Properties.Resources.Dialog_Title_Error, MessageBoxButton.OK, MessageBoxImage.Error);
                 Environment.Exit(1);
             }
+            finally
+            {
+                this.suppressSelectionPersistence = false;
+            }
+        }
+
+        private string GetSelectedProfileName()
+        {
+            var item = this.ProfilesListView.SelectedItem as ProfileItem;
+            return item == null ? null : item.Name;
+        }
+
+        private string GetSelectedModID()
+        {
+            var item = this.ModTreeView.SelectedItem as ModItem;
+            return (item == null || item.Node == null) ? null : item.Node.ID;
+        }
+
+        /// <summary>
+        /// Selects the profile with the given name, if it exists in the list.
+        /// Does nothing (leaves the current selection, typically none) if not found.
+        /// </summary>
+        private void SelectProfileByName(string name)
+        {
+            if (String.IsNullOrEmpty(name)) return;
+            foreach (ProfileItem item in this.ProfilesListView.Items)
+            {
+                if (item.Name == name)
+                {
+                    this.ProfilesListView.SelectedItem = item;
+                    return;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Selects the profile with the given name if it exists; otherwise falls
+        /// back to selecting the first profile in the list (if any). Used at
+        /// startup so a fresh install with no saved preference still has a
+        /// sensible default selection instead of requiring an extra click.
+        /// </summary>
+        private void SelectDefaultOrLastProfile(string preferredName)
+        {
+            if (!String.IsNullOrEmpty(preferredName))
+            {
+                foreach (ProfileItem item in this.ProfilesListView.Items)
+                {
+                    if (item.Name == preferredName)
+                    {
+                        this.ProfilesListView.SelectedItem = item;
+                        return;
+                    }
+                }
+            }
+            if (this.ProfilesListView.Items.Count > 0)
+            {
+                this.ProfilesListView.SelectedItem = this.ProfilesListView.Items[0];
+            }
+        }
+
+        /// <summary>
+        /// Selects the mod with the given Node.ID anywhere in the tree, if it exists.
+        /// Does nothing (leaves the current selection, typically none) if not found.
+        /// </summary>
+        private void SelectModByID(string id)
+        {
+            if (String.IsNullOrEmpty(id)) return;
+            this.TrySelectModByID(this.ModTreeView.Items.Cast<ModItem>(), id);
+        }
+
+        private bool TrySelectModByID(IEnumerable<ModItem> items, string id)
+        {
+            foreach (var item in items)
+            {
+                if (item.Node.ID == id)
+                {
+                    item.IsSelected = true;
+                    return true;
+                }
+                if (this.TrySelectModByID(item.Items, id))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         /// <summary>
@@ -53,6 +151,7 @@ namespace Mo3ModManager
             this.RunButtonText.Text = Properties.Resources.RunButton_Text;
             this.InstallModButtonText.Text = Properties.Resources.InstallModButton_Text;
             this.DeleteModButtonText.Text = Properties.Resources.DeleteModButton_Text;
+            this.RefreshButtonText.Text = Properties.Resources.RefreshButton_Text;
             this.NewProfileButtonText.Text = Properties.Resources.NewProfileButton_Text;
             this.RenameProfileButtonText.Text = Properties.Resources.RenameProfileButton_Text;
             this.DeleteProfileButtonText.Text = Properties.Resources.DeleteProfileButton_Text;
@@ -183,6 +282,12 @@ namespace Mo3ModManager
                 this.DeleteModButton.IsEnabled = false;
             }
             this.UpdateRunButtonStatus();
+
+            if (!this.suppressSelectionPersistence)
+            {
+                Properties.Settings.Default.LastModID = this.GetSelectedModID() ?? String.Empty;
+                Properties.Settings.Default.Save();
+            }
         }
 
         private void On_ProgProfilesListView_SelectionChanged()
@@ -203,6 +308,12 @@ namespace Mo3ModManager
                 this.DeleteProfileButton.IsEnabled = false;
             }
             this.UpdateRunButtonStatus();
+
+            if (!this.suppressSelectionPersistence)
+            {
+                Properties.Settings.Default.LastProfileName = this.GetSelectedProfileName() ?? String.Empty;
+                Properties.Settings.Default.Save();
+            }
         }
 
         private void ProfilesListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -246,7 +357,21 @@ namespace Mo3ModManager
                      MessageBox.Show(worker_e.Error.Message, Properties.Resources.Dialog_Title_Error, MessageBoxButton.OK, MessageBoxImage.Error);
                  }
 
-                 this.BuildProfiles();
+                 // BuildProfiles() clears and re-adds all items (profile sizes may
+                 // have changed from the game run), which would otherwise clear
+                 // the selection. Preserve and restore it so the user isn't forced
+                 // to re-pick the profile before they can run again.
+                 string profileNameToRestore = this.GetSelectedProfileName();
+                 this.suppressSelectionPersistence = true;
+                 try
+                 {
+                     this.BuildProfiles();
+                     this.SelectProfileByName(profileNameToRestore);
+                 }
+                 finally
+                 {
+                     this.suppressSelectionPersistence = false;
+                 }
              };
 
 
@@ -266,6 +391,34 @@ namespace Mo3ModManager
         private void BrowseButton_Click(object sender, RoutedEventArgs e)
         {
             System.Diagnostics.Process.Start(AppDomain.CurrentDomain.BaseDirectory);
+        }
+
+        private void RefreshButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Preserve the current selection across the rebuild: BuildTreeView/
+            // BuildProfiles both clear and re-add all items, which would
+            // otherwise silently drop the user's current selection every time
+            // they refresh.
+            string modIDToRestore = this.GetSelectedModID();
+            string profileNameToRestore = this.GetSelectedProfileName();
+
+            this.suppressSelectionPersistence = true;
+            try
+            {
+                this.BuildTreeView();
+                this.SelectModByID(modIDToRestore);
+
+                this.BuildProfiles();
+                this.SelectProfileByName(profileNameToRestore);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, Properties.Resources.Dialog_Title_Error, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                this.suppressSelectionPersistence = false;
+            }
         }
 
         private string PurifyFileName(string Filename)
@@ -426,7 +579,17 @@ namespace Mo3ModManager
 
                     IO.CreateHardLinksOfFiles(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Incoming"), System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Mods"));
 
-                    this.BuildTreeView();
+                    string modIDToRestore = this.GetSelectedModID();
+                    this.suppressSelectionPersistence = true;
+                    try
+                    {
+                        this.BuildTreeView();
+                        this.SelectModByID(modIDToRestore);
+                    }
+                    finally
+                    {
+                        this.suppressSelectionPersistence = false;
+                    }
                 }
                 catch (Exception ex)
                 {

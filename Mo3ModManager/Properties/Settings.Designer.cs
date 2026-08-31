@@ -40,5 +40,37 @@ namespace Mo3ModManager.Properties
                 this["Language"] = value;
             }
         }
+
+        /// <summary>
+        /// The name of the last-selected Profile, remembered across restarts and
+        /// re-applied automatically so the user doesn't have to re-select it every time.
+        /// </summary>
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LastProfileName {
+            get {
+                return ((string)(this["LastProfileName"]));
+            }
+            set {
+                this["LastProfileName"] = value;
+            }
+        }
+
+        /// <summary>
+        /// The ID of the last-selected mod (Node.ID), remembered across restarts and
+        /// re-applied automatically so the user doesn't have to re-select it every time.
+        /// </summary>
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LastModID {
+            get {
+                return ((string)(this["LastModID"]));
+            }
+            set {
+                this["LastModID"] = value;
+            }
+        }
     }
 }

@@ -22,6 +22,22 @@ namespace Mo3ModManager
 
         public string Title { get { return this.Name; } }
 
+        // Bound two-way to TreeViewItem.IsSelected via the ItemContainerStyle in
+        // MainWindow.xaml. This is the standard workaround for TreeView.SelectedItem
+        // being read-only: setting this property programmatically (e.g. to restore
+        // a previous selection after rebuilding the tree) selects the corresponding
+        // TreeViewItem once its container exists.
+        private bool isSelected;
+        public bool IsSelected {
+            get {
+                return this.isSelected;
+            }
+            set {
+                this.isSelected = value;
+                NotifyPropertyChanged("IsSelected");
+            }
+        }
+
         public System.Collections.ObjectModel.ObservableCollection<ModItem> Items { get; set; }
 
         //the following properties is not used by UI
