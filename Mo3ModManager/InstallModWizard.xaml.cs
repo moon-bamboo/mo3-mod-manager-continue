@@ -34,6 +34,15 @@ namespace Mo3ModManager
 
         private readonly string rootPath;
 
+        // Default Windows compatibility layer flags: "~" marks this as a custom
+        // layer (rather than an "emulate old Windows version" mode), RUNASADMIN
+        // requests elevation, and HIGHDPIAWARE tells Windows this app handles its
+        // own DPI scaling (avoids blurry upscaling on high-DPI displays). This
+        // matches what mo3.club's own official mod packages use for their
+        // Red Alert 2 engine-based executables, so it's a sensible default for
+        // this game specifically -- though it may not fit every mod.
+        private const string DefaultCompatibilityFlags = "~ RUNASADMIN HIGHDPIAWARE";
+
         public InstallModWizard(Window owner, string rootPath, string archiveDisplayName, IEnumerable<Node> existingNodes)
         {
             this.InitializeComponent();
@@ -46,6 +55,7 @@ namespace Mo3ModManager
             this.FolderTreeView.Items.Add(rootFolderNode);
 
             this.IdTextBox.Text = Guid.NewGuid().ToString();
+            this.CompatibilityTextBox.Text = DefaultCompatibilityFlags;
 
             this.ParentComboBox.Items.Add(new ParentOption { Display = Properties.Resources.InstallWizard_NoParent, ID = String.Empty });
             foreach (var node in existingNodes.OrderBy(n => n.Name))

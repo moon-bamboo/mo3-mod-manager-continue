@@ -266,4 +266,25 @@
   <data name="InstallWizard_FolderRequired" xml:space="preserve">
     <value>Please select which folder's contents should become the mod's files.</value>
   </data>
+  <data name="RenameModMenuItem_Text" xml:space="preserve">
+    <value>_Rename...</value>
+  </data>
+  <data name="RenameMod_Prompt" xml:space="preserve">
+    <value>What is the mod's new name?</value>
+  </data>
+  <data name="RenameMod_Caption" xml:space="preserve">
+    <value>Rename Mod...</value>
+  </data>
+  <data name="HideModMenuItem_Text" xml:space="preserve">
+    <value>_Hide</value>
+  </data>
+  <data name="UnhideModMenuItem_Text" xml:space="preserve">
+    <value>_Unhide</value>
+  </data>
+  <data name="ShowHiddenModsCheckBox_Text" xml:space="preserve">
+    <value>Show hidden mods</value>
+  </data>
+  <data name="HiddenModSuffix" xml:space="preserve">
+    <value>(hidden)</value>
+  </data>
 </root>

@@ -207,4 +207,25 @@
   <data name="InstallWizard_FolderRequired" xml:space="preserve">
     <value>请选择哪个文件夹的内容作为此 Mod 的文件。</value>
   </data>
+  <data name="RenameModMenuItem_Text" xml:space="preserve">
+    <value>重命名...(_R)</value>
+  </data>
+  <data name="RenameMod_Prompt" xml:space="preserve">
+    <value>Mod 的新名称是？</value>
+  </data>
+  <data name="RenameMod_Caption" xml:space="preserve">
+    <value>重命名 Mod...</value>
+  </data>
+  <data name="HideModMenuItem_Text" xml:space="preserve">
+    <value>隐藏(_H)</value>
+  </data>
+  <data name="UnhideModMenuItem_Text" xml:space="preserve">
+    <value>取消隐藏(_U)</value>
+  </data>
+  <data name="ShowHiddenModsCheckBox_Text" xml:space="preserve">
+    <value>显示隐藏的 Mod</value>
+  </data>
+  <data name="HiddenModSuffix" xml:space="preserve">
+    <value>(已隐藏)</value>
+  </data>
 </root>

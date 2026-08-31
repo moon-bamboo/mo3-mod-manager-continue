@@ -96,6 +96,7 @@
     </Compile>
     <Compile Include="FolderTreeNode.cs" />
     <Compile Include="IO.cs" />
+    <Compile Include="ModDisplayState.cs" />
     <Compile Include="LocalizationManager.cs" />
     <Compile Include="ModProcessManager.cs" />
     <Compile Include="ModProcessManagerArguments.cs" />

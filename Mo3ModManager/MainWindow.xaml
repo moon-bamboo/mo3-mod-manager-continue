@@ -7,6 +7,14 @@
         mc:Ignorable="d"
         FontSize="14"
         Title="Mental Omega Mod Manager" Height="450" Width="800" Icon="Icon.ico" WindowStartupLocation="CenterScreen" Closing="Window_Closing">
+    <Window.Resources>
+        <!-- Shared per-item context menu for mods in ModTreeView. Applied to
+             every TreeViewItem via the ItemContainerStyle below. -->
+        <ContextMenu x:Key="ModItemContextMenu" Opened="ModItemContextMenu_Opened">
+            <MenuItem x:Name="RenameModMenuItem" Click="RenameModMenuItem_Click" Header="_Rename..." />
+            <MenuItem x:Name="ToggleHideModMenuItem" Click="ToggleHideModMenuItem_Click" Header="_Hide" />
+        </ContextMenu>
+    </Window.Resources>
     <Grid>
         <DockPanel LastChildFill="True" >
             <Grid DockPanel.Dock="Bottom" Margin="5">
@@ -74,27 +82,49 @@
 
 
             <GroupBox x:Name="ModsGroupBox"  DockPanel.Dock="Top"  Header="Mods" Margin="5">
+              <DockPanel LastChildFill="True">
+                <CheckBox x:Name="ShowHiddenModsCheckBox" DockPanel.Dock="Top" Margin="2" Checked="ShowHiddenModsCheckBox_CheckedChanged" Unchecked="ShowHiddenModsCheckBox_CheckedChanged">
+                    <AccessText x:Name="ShowHiddenModsCheckBoxText">Show hidden mods</AccessText>
+                </CheckBox>
                 <TreeView x:Name="ModTreeView" SelectedItemChanged="ModTreeView_SelectedItemChanged">
                     <!--Bind TreeViewItem-->
                     <TreeView.ItemTemplate>
                         <HierarchicalDataTemplate DataType="{x:Type local:ModItem}" ItemsSource="{Binding Items}">
-                            <TextBlock Text="{Binding Title}"  />
+                            <!-- Title already appends a localized "(hidden)" suffix
+                                 when IsHidden is true (see ModItem.Title); the trigger
+                                 below additionally grays out the text so hidden mods
+                                 (only visible at all when "show hidden mods" is
+                                 checked) are visually distinct from normal ones. -->
+                            <TextBlock x:Name="ModItemTextBlock" Text="{Binding Title}" />
+                            <HierarchicalDataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding IsHidden}" Value="True">
+                                    <Setter TargetName="ModItemTextBlock" Property="Foreground" Value="Gray" />
+                                </DataTrigger>
+                            </HierarchicalDataTemplate.Triggers>
                         </HierarchicalDataTemplate>
                     </TreeView.ItemTemplate>
 
                     <!--Expanded by default. IsSelected is bound two-way so that
                          setting ModItem.IsSelected in code (e.g. to restore the
                          last-used mod after a rebuild) selects the corresponding
-                         TreeViewItem, since TreeView.SelectedItem itself is read-only.-->
+                         TreeViewItem, since TreeView.SelectedItem itself is read-only.
+                         PreviewMouseRightButtonDown selects the item under the
+                         cursor before the context menu opens, since WPF's TreeView
+                         (unlike ListView) does not do this automatically on
+                         right-click; without it, right-clicking mod B while mod
+                         A is selected would open the menu for mod A.-->
                     <TreeView.ItemContainerStyle>
                         <Style TargetType="{x:Type TreeViewItem}">
                             <Setter Property="IsExpanded" Value="True" />
                             <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+                            <Setter Property="ContextMenu" Value="{StaticResource ModItemContextMenu}" />
+                            <EventSetter Event="PreviewMouseRightButtonDown" Handler="ModTreeViewItem_PreviewMouseRightButtonDown" />
                         </Style>
                     </TreeView.ItemContainerStyle>
 
 
                 </TreeView>
+              </DockPanel>
             </GroupBox>
 
         </DockPanel>

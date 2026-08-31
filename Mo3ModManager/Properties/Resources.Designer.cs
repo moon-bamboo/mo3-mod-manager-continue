@@ -397,5 +397,47 @@ namespace Mo3ModManager.Properties
                 return GetLocalizedString("InstallWizard_FolderRequired");
             }
         }
+
+        internal static string RenameModMenuItem_Text {
+            get {
+                return GetLocalizedString("RenameModMenuItem_Text");
+            }
+        }
+
+        internal static string RenameMod_Prompt {
+            get {
+                return GetLocalizedString("RenameMod_Prompt");
+            }
+        }
+
+        internal static string RenameMod_Caption {
+            get {
+                return GetLocalizedString("RenameMod_Caption");
+            }
+        }
+
+        internal static string HideModMenuItem_Text {
+            get {
+                return GetLocalizedString("HideModMenuItem_Text");
+            }
+        }
+
+        internal static string UnhideModMenuItem_Text {
+            get {
+                return GetLocalizedString("UnhideModMenuItem_Text");
+            }
+        }
+
+        internal static string ShowHiddenModsCheckBox_Text {
+            get {
+                return GetLocalizedString("ShowHiddenModsCheckBox_Text");
+            }
+        }
+
+        internal static string HiddenModSuffix {
+            get {
+                return GetLocalizedString("HiddenModSuffix");
+            }
+        }
     }
 }

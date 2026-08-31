@@ -20,6 +20,7 @@ namespace Mo3ModManager
     public partial class MainWindow : Window
     {
         NodeTree NodeTree;
+        ModDisplayState DisplayState;
 
         // Suppresses persisting the current selection to user settings while
         // we are programmatically restoring a previously-saved selection (as
@@ -157,6 +158,20 @@ namespace Mo3ModManager
             this.DeleteProfileButtonText.Text = Properties.Resources.DeleteProfileButton_Text;
             this.AboutButtonText.Text = Properties.Resources.AboutButton_Text;
             this.LanguageButtonText.Text = Properties.Resources.LanguageButton_Text;
+
+            // The context menu is defined in Window.Resources (so it can be
+            // shared across all TreeViewItems via ItemContainerStyle), which
+            // means its x:Name'd children are not registered in the window's
+            // namescope and can't be referenced via generated fields (unlike
+            // elements in the main visual tree). Look it up via the resource
+            // key instead.
+            var modContextMenu = (ContextMenu)this.Resources["ModItemContextMenu"];
+            var renameMenuItem = (MenuItem)modContextMenu.Items[0];
+            renameMenuItem.Header = Properties.Resources.RenameModMenuItem_Text;
+            // ToggleHideModMenuItem's text is set dynamically in
+            // ModItemContextMenu_Opened (it depends on the selected mod's
+            // hidden state), so it's intentionally not set here.
+            this.ShowHiddenModsCheckBoxText.Text = Properties.Resources.ShowHiddenModsCheckBox_Text;
             this.ProfilesGroupBox.Header = Properties.Resources.ProfilesGroupBox_HeaderNoSelection;
             this.ModsGroupBox.Header = Properties.Resources.ModsGroupBox_HeaderNoSelection;
         }
@@ -251,12 +266,21 @@ namespace Mo3ModManager
         {
             this.ModTreeView.Items.Clear();
 
+            string modsDirectory = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Mods");
+
             this.NodeTree = new NodeTree();
-            this.NodeTree.AddNodes(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Mods"));
+            this.NodeTree.AddNodes(modsDirectory);
+
+            this.DisplayState = ModDisplayState.Load(modsDirectory);
+
+            bool showHidden = this.ShowHiddenModsCheckBox.IsChecked == true;
+            Func<Node, bool> shouldInclude = node => showHidden || !this.DisplayState.IsHidden(node.ID);
+            Func<Node, bool> isHidden = node => this.DisplayState.IsHidden(node.ID);
 
             foreach (var rootNode in this.NodeTree.RootNodes)
             {
-                this.ModTreeView.Items.Add(new ModItem(rootNode));
+                if (!shouldInclude(rootNode)) continue;
+                this.ModTreeView.Items.Add(new ModItem(rootNode, shouldInclude, isHidden));
             }
 
         }
@@ -273,7 +297,11 @@ namespace Mo3ModManager
                 var selectedItem = this.ModTreeView.SelectedItem as ModItem;
                 this.ModsGroupBox.Header = String.Format(Properties.Resources.ModsGroupBox_HeaderWithName, selectedItem.Title);
 
-                this.DeleteModButton.IsEnabled = (selectedItem.Items.Count == 0);
+                // Deliberately checks Node.Childs (the real underlying data),
+                // not selectedItem.Items (the possibly-filtered UI tree): if a
+                // child mod is hidden, it's absent from Items even though it
+                // still exists on disk, and deleting this mod would orphan it.
+                this.DeleteModButton.IsEnabled = (selectedItem.Node.Childs.Count == 0);
             }
             else
             {
@@ -393,6 +421,26 @@ namespace Mo3ModManager
             System.Diagnostics.Process.Start(AppDomain.CurrentDomain.BaseDirectory);
         }
 
+        private void ShowHiddenModsCheckBox_CheckedChanged(object sender, RoutedEventArgs e)
+        {
+            // Guard against firing during InitializeComponent(), before
+            // suppressSelectionPersistence/DisplayState are ready, and before
+            // there's anything meaningful to rebuild.
+            if (this.NodeTree == null) return;
+
+            string modIDToRestore = this.GetSelectedModID();
+            this.suppressSelectionPersistence = true;
+            try
+            {
+                this.BuildTreeView();
+                this.SelectModByID(modIDToRestore);
+            }
+            finally
+            {
+                this.suppressSelectionPersistence = false;
+            }
+        }
+
         private void RefreshButton_Click(object sender, RoutedEventArgs e)
         {
             // Preserve the current selection across the rebuild: BuildTreeView/
@@ -498,6 +546,109 @@ namespace Mo3ModManager
             System.Diagnostics.Process.Start(selectedItem.Directory);
         }
 
+        /// <summary>
+        /// Selects the TreeViewItem under the mouse before its context menu
+        /// opens. WPF's TreeView does not do this automatically on right-click
+        /// (unlike ListView), so without this, right-clicking a different mod
+        /// than the currently-selected one would still show the menu for the
+        /// old selection.
+        /// </summary>
+        private void ModTreeViewItem_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var item = sender as TreeViewItem;
+            if (item != null)
+            {
+                item.IsSelected = true;
+                e.Handled = false;
+            }
+        }
+
+        /// <summary>
+        /// Refreshes the "Hide"/"Unhide" wording each time the context menu is
+        /// opened, since it depends on the currently-selected mod's hidden
+        /// state, which can differ each time the menu is invoked.
+        /// </summary>
+        private void ModItemContextMenu_Opened(object sender, RoutedEventArgs e)
+        {
+            var selectedItem = this.ModTreeView.SelectedItem as ModItem;
+            if (selectedItem == null) return;
+
+            // Same namescope caveat as the rename menu item: this ContextMenu
+            // lives in Window.Resources, so its x:Name'd children aren't
+            // reachable via generated fields; look it up by resource key and
+            // item index instead.
+            var modContextMenu = (ContextMenu)sender;
+            var toggleHideMenuItem = (MenuItem)modContextMenu.Items[1];
+
+            bool isHidden = this.DisplayState.IsHidden(selectedItem.Node.ID);
+            toggleHideMenuItem.Header = isHidden ? Properties.Resources.UnhideModMenuItem_Text : Properties.Resources.HideModMenuItem_Text;
+        }
+
+        private void ToggleHideModMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedItem = this.ModTreeView.SelectedItem as ModItem;
+            if (selectedItem == null) return;
+
+            try
+            {
+                bool currentlyHidden = this.DisplayState.IsHidden(selectedItem.Node.ID);
+                this.DisplayState.SetHidden(selectedItem.Node.ID, !currentlyHidden);
+                this.DisplayState.Save(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Mods"));
+
+                // Unhiding never needs a rebuild (the mod is already visible,
+                // since you can only reach this menu item on a mod that IS
+                // currently shown). Hiding, though, removes this mod (and its
+                // subtree) from the list -- unless "show hidden mods" is
+                // checked, in which case it should stay put. Either way,
+                // rebuilding is the simplest way to get a correct result.
+                string modIDToRestore = currentlyHidden ? selectedItem.Node.ID : this.GetSelectedModID();
+                this.suppressSelectionPersistence = true;
+                try
+                {
+                    this.BuildTreeView();
+                    this.SelectModByID(modIDToRestore);
+                }
+                finally
+                {
+                    this.suppressSelectionPersistence = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, Properties.Resources.Dialog_Title_Error, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void RenameModMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedItem = this.ModTreeView.SelectedItem as ModItem;
+            if (selectedItem == null) return;
+
+            string newName = InputWindow.ShowDialog(this, Properties.Resources.RenameMod_Prompt, Properties.Resources.RenameMod_Caption);
+            if (String.IsNullOrWhiteSpace(newName)) return;
+            newName = newName.Trim();
+
+            try
+            {
+                selectedItem.Node.Name = newName;
+                selectedItem.Node.Write(selectedItem.Node.Directory);
+
+                // Update the already-loaded tree/UI in place rather than doing a
+                // full BuildTreeView(): this mod's ID and position haven't
+                // changed, only its display name, so there's no need to lose
+                // and restore tree expansion/selection state for a full reload.
+                selectedItem.Name = newName;
+                if (selectedItem == this.ModTreeView.SelectedItem)
+                {
+                    this.ModsGroupBox.Header = String.Format(Properties.Resources.ModsGroupBox_HeaderWithName, selectedItem.Title);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, Properties.Resources.Dialog_Title_Error, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
         private void AboutButton_MouseEnter(object sender, MouseEventArgs e)
         {
             // Mutate the existing AccessText's Text property rather than
@@ -523,6 +674,16 @@ namespace Mo3ModManager
                     System.IO.Directory.Delete(selectedItem.Node.Directory, true);
 
                     this.NodeTree.RemoveNode(selectedItem.Node);
+
+                    // Clean up any leftover hidden-state entry for this mod so
+                    // it doesn't linger in ModManagerState.json forever, and
+                    // (however unlikely) can't cause a future mod that happens
+                    // to reuse this ID to start out hidden unexpectedly.
+                    if (this.DisplayState.IsHidden(selectedItem.Node.ID))
+                    {
+                        this.DisplayState.SetHidden(selectedItem.Node.ID, false);
+                        this.DisplayState.Save(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Mods"));
+                    }
 
                     if (selectedItem.Parent == null)
                     {
