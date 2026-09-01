@@ -1,11 +1,7 @@
 # Mental Omega Mod Manager
-By: Sad Pencil <me@pencil.live>
 
-## Description
-A game manager using NTFS hardlink to manage games - not limited to Mental Omega but a lot of programs.
-https://youtu.be/dt7mFa-uhwo
+原作者: Sad Pencil <me@pencil.live>
+当前版本维护者：moonbamboo
 
-## Features
-- One-click custom mission installation
-- Multi-version game switching
-- Multi profiles
+## 简介
+通过NTFS硬链接管理游戏与模组的管理器，虽然名为“心灵终结模组管理器”，但是并不局限于心灵终结。

@@ -7,12 +7,12 @@ using System.Windows;
 // 有关程序集的一般信息由以下
 // 控制。更改这些特性值可修改
 // 与程序集关联的信息。
-[assembly: AssemblyTitle("Mo3ModManager")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Mo3ModManager(Unofficial)")]
+[assembly: AssemblyDescription("基于 Sad Pencil 原版的个人修改维护版。")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Mo3ModManager")]
-[assembly: AssemblyCopyright("Copyright © mo3.club 2018")]
+[assembly: AssemblyCompany("moonbamboo")]
+[assembly: AssemblyProduct("Mo3ModManager(Unofficial)")]
+[assembly: AssemblyCopyright("Copyright © 2018 Sad Pencil <me@pencil.live>； Modified version Copyright © 2026 moonbamboo")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -52,4 +52,4 @@ using System.Windows;
 // 方法是按如下所示使用“*”: :
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.1.0.5")]
+[assembly: AssemblyFileVersion("1.0.0")]
