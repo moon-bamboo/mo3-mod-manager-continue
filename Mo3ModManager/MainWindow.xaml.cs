@@ -945,13 +945,31 @@ namespace Mo3ModManager
                         this.DisplayState.Save(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Mods"));
                     }
 
-                    if (selectedItem.Parent == null)
+                    // The deleted mod's saved "last selected" ID (if it was
+                    // this one) is now stale; clear it so a restart doesn't
+                    // silently fail to restore a selection that no longer
+                    // exists.
+                    if (Properties.Settings.Default.LastModID == selectedItem.Node.ID)
                     {
-                        this.ProfilesListView.Items.Remove(selectedItem);
+                        Properties.Settings.Default.LastModID = String.Empty;
+                        Properties.Settings.Default.Save();
                     }
-                    else
+
+                    // Rebuild the whole tree (like RefreshButton_Click) rather
+                    // than surgically removing just this one item from the
+                    // UI. This also fixes a latent bug where deleting a
+                    // root-level mod removed it from the wrong control's item
+                    // collection (ProfilesListView instead of ModTreeView),
+                    // leaving it visibly stuck in the tree until the next
+                    // manual refresh.
+                    this.suppressSelectionPersistence = true;
+                    try
                     {
-                        selectedItem.Parent.Items.Remove(selectedItem);
+                        this.BuildTreeView();
+                    }
+                    finally
+                    {
+                        this.suppressSelectionPersistence = false;
                     }
                 }
                 catch (Exception ex)
