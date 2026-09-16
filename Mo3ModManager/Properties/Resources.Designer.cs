@@ -487,5 +487,107 @@ namespace Mo3ModManager.Properties
                 return GetLocalizedString("OpenModFolderMenuItem_Text");
             }
         }
+
+        internal static string ChangeModParentMenuItem_Text {
+            get {
+                return GetLocalizedString("ChangeModParentMenuItem_Text");
+            }
+        }
+
+        internal static string ChangeModMainExecutableMenuItem_Text {
+            get {
+                return GetLocalizedString("ChangeModMainExecutableMenuItem_Text");
+            }
+        }
+
+        internal static string ChangeModArgumentsMenuItem_Text {
+            get {
+                return GetLocalizedString("ChangeModArgumentsMenuItem_Text");
+            }
+        }
+
+        internal static string ChangeModCompatibilityMenuItem_Text {
+            get {
+                return GetLocalizedString("ChangeModCompatibilityMenuItem_Text");
+            }
+        }
+
+        internal static string ChangeModParent_Prompt {
+            get {
+                return GetLocalizedString("ChangeModParent_Prompt");
+            }
+        }
+
+        internal static string ChangeModParent_Caption {
+            get {
+                return GetLocalizedString("ChangeModParent_Caption");
+            }
+        }
+
+        internal static string ChangeModMainExecutable_Prompt {
+            get {
+                return GetLocalizedString("ChangeModMainExecutable_Prompt");
+            }
+        }
+
+        internal static string ChangeModMainExecutable_Caption {
+            get {
+                return GetLocalizedString("ChangeModMainExecutable_Caption");
+            }
+        }
+
+        internal static string ChangeModArguments_Prompt {
+            get {
+                return GetLocalizedString("ChangeModArguments_Prompt");
+            }
+        }
+
+        internal static string ChangeModArguments_Caption {
+            get {
+                return GetLocalizedString("ChangeModArguments_Caption");
+            }
+        }
+
+        internal static string ChangeModCompatibility_Prompt {
+            get {
+                return GetLocalizedString("ChangeModCompatibility_Prompt");
+            }
+        }
+
+        internal static string ChangeModCompatibility_Caption {
+            get {
+                return GetLocalizedString("ChangeModCompatibility_Caption");
+            }
+        }
+
+        internal static string GameRunningWindow_Title {
+            get {
+                return GetLocalizedString("GameRunningWindow_Title");
+            }
+        }
+
+        internal static string GameRunningWindow_Status {
+            get {
+                return GetLocalizedString("GameRunningWindow_Status");
+            }
+        }
+
+        internal static string GameRunningWindow_Hint {
+            get {
+                return GetLocalizedString("GameRunningWindow_Hint");
+            }
+        }
+
+        internal static string GameRunningWindow_ForceUnlockButton {
+            get {
+                return GetLocalizedString("GameRunningWindow_ForceUnlockButton");
+            }
+        }
+
+        internal static string GameRunningWindow_ConfirmForceUnlock {
+            get {
+                return GetLocalizedString("GameRunningWindow_ConfirmForceUnlock");
+            }
+        }
     }
 }

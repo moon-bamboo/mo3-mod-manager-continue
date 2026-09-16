@@ -573,6 +573,23 @@
 
         }
 
+        public partial class NativeMethods
+        {
+
+            /// Return Type: BOOL->int
+            ///hJob: HANDLE->void*
+            ///uExitCode: UINT->unsigned int
+            /// Terminates every process currently associated with the job, as
+            /// if TerminateProcess had been called on each individually. Used
+            /// as a last-resort escape hatch for the (hopefully rare) case
+            /// where a game process tree somehow escapes the Job Object used
+            /// to detect its exit (see ModProcessManager.TryForceTerminate).
+            [System.Runtime.InteropServices.DllImportAttribute("kernel32.dll", EntryPoint = "TerminateJobObject", CharSet = System.Runtime.InteropServices.CharSet.Unicode)]
+            [return: System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.Bool)]
+            public static extern bool TerminateJobObject([System.Runtime.InteropServices.InAttribute()] System.IntPtr hJob, uint uExitCode);
+
+        }
+
         #endregion
 
         public partial class NativeConstants

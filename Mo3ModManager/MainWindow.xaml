@@ -15,6 +15,11 @@
             <Separator />
             <MenuItem x:Name="RenameModMenuItem" Click="RenameModMenuItem_Click" Header="_Rename..." />
             <MenuItem x:Name="ChangeModIdMenuItem" Click="ChangeModIdMenuItem_Click" Header="Change _ID..." />
+            <MenuItem x:Name="ChangeModParentMenuItem" Click="ChangeModParentMenuItem_Click" Header="Change _Parent..." />
+            <MenuItem x:Name="ChangeModMainExecutableMenuItem" Click="ChangeModMainExecutableMenuItem_Click" Header="Change _Main Executable..." />
+            <MenuItem x:Name="ChangeModArgumentsMenuItem" Click="ChangeModArgumentsMenuItem_Click" Header="Change Ar_guments..." />
+            <MenuItem x:Name="ChangeModCompatibilityMenuItem" Click="ChangeModCompatibilityMenuItem_Click" Header="Change Co_mpatibility Mode..." />
+            <Separator />
             <MenuItem x:Name="ToggleHideModMenuItem" Click="ToggleHideModMenuItem_Click" Header="_Hide" />
         </ContextMenu>
     </Window.Resources>

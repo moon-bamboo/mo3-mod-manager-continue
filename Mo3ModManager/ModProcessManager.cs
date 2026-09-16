@@ -42,6 +42,47 @@ namespace Mo3ModManager
         //public ModItem ModItem { get; set; }
         public Node Node { get; set; }
 
+        // Guards access to jobHandle below, since it's written from the
+        // background worker thread (RunStep2_RunAndWait) but may be read
+        // from the UI thread at any time (TryForceTerminate, if the user
+        // clicks "force unlock").
+        private readonly object jobHandleLock = new object();
+
+        // The handle of the Job Object the game (and its descendants) is
+        // running in, valid only while RunStep2_RunAndWait's wait loop is
+        // active. IntPtr.Zero otherwise (before the job is created, or after
+        // it's been closed). See TryForceTerminate.
+        private IntPtr jobHandle = IntPtr.Zero;
+
+        /// <summary>
+        /// Last-resort escape hatch for when the normal exit-detection
+        /// mechanism (waiting on the Job Object's completion port) never
+        /// fires -- e.g. because some descendant process escaped the Job
+        /// Object by some means this code doesn't account for, and lingers
+        /// after the game itself has actually been closed by the user.
+        /// Forcibly terminates every process still in the job (equivalent to
+        /// calling TerminateProcess on each), which causes the job's active
+        /// process count to reach zero and thus makes the existing wait loop
+        /// in RunStep2_RunAndWait observe JOB_OBJECT_MSG_ACTIVE_PROCESS_ZERO
+        /// and return normally -- so RunStep3_Clean (which preserves save
+        /// data) still runs afterwards, same as a normal exit. This is why
+        /// force-terminating the job is preferable to the user killing the
+        /// whole Mod Manager process themselves: killing Mod Manager skips
+        /// RunStep3_Clean entirely, silently discarding that run's save data.
+        /// Returns false if there is currently no active job to terminate
+        /// (e.g. this was called before the game started, after it already
+        /// exited normally, or when running via the legacy Windows 7 path,
+        /// which does not use a Job Object at all).
+        /// </summary>
+        public bool TryForceTerminate()
+        {
+            lock (this.jobHandleLock)
+            {
+                if (this.jobHandle == IntPtr.Zero) return false;
+                return Win32.NativeMethods.TerminateJobObject(this.jobHandle, 1);
+            }
+        }
+
 
 
         /// <summary>
@@ -138,8 +179,6 @@ namespace Mo3ModManager
         /// <param name="WorkingDirectory">The working directory.</param>
         private void RunStep2_RunAndWait(string Fullname, string Arguments, string WorkingDirectory)
         {
-            string commandLine = '"' + Fullname + '"' + (String.IsNullOrEmpty(Arguments) ? string.Empty : ' ' + Arguments);
-
             //See : https://blogs.msdn.microsoft.com/oldnewthing/20130405-00/?p=4743
 
             Trace.WriteLine("[Note] Start up the game...");
@@ -150,6 +189,31 @@ namespace Mo3ModManager
                 throw new Exception("WinAPI CreateJobObjectW failed. Error " + Win32.NativeMethods.GetLastError());
             }
 
+            // Publish the handle for TryForceTerminate to use, now that it's
+            // valid. Cleared again in the finally block below once this
+            // method is done with it (whether it exited normally or is about
+            // to throw), so TryForceTerminate never acts on a stale handle.
+            lock (this.jobHandleLock)
+            {
+                this.jobHandle = jobHandle;
+            }
+
+            try
+            {
+                this.RunStep2_RunAndWaitCore(jobHandle, Fullname, Arguments, WorkingDirectory);
+            }
+            finally
+            {
+                lock (this.jobHandleLock)
+                {
+                    this.jobHandle = IntPtr.Zero;
+                }
+            }
+        }
+
+        private void RunStep2_RunAndWaitCore(IntPtr jobHandle, string Fullname, string Arguments, string WorkingDirectory)
+        {
+            string commandLine = '"' + Fullname + '"' + (String.IsNullOrEmpty(Arguments) ? string.Empty : ' ' + Arguments);
 
             IntPtr ioPortHandle = Win32.NativeMethods.CreateIoCompletionPort(Win32.NativeConstants.INVALID_HANDLE_VALUE, IntPtr.Zero, 0, 1);
             if (ioPortHandle == IntPtr.Zero)

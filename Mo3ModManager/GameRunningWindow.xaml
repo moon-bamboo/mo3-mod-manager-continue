@@ -1,0 +1,29 @@
+<Window x:Class="Mo3ModManager.GameRunningWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Mo3ModManager"
+        mc:Ignorable="d"
+        FontSize="14"
+        Title="Game is running..." Height="160" Width="360" ShowInTaskbar="True"
+        WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Topmost="True"
+        Closing="Window_Closing">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock x:Name="StatusText" Grid.Row="0" TextWrapping="Wrap" VerticalAlignment="Center"
+                   Text="The game is currently running. Mod Manager is waiting for it to exit." />
+
+        <TextBlock x:Name="HintText" Grid.Row="1" TextWrapping="Wrap" Margin="0,8,0,8" Foreground="DimGray" FontSize="12"
+                   Text="Only use the button below if the game has already exited but this window did not detect it. Otherwise, just close the game normally." />
+
+        <Button x:Name="ForceUnlockButton" Grid.Row="2" HorizontalAlignment="Right" Padding="8,4" Click="ForceUnlockButton_Click">
+            <AccessText x:Name="ForceUnlockButtonText">_Force Unlock (only if the game already exited)</AccessText>
+        </Button>
+    </Grid>
+</Window>

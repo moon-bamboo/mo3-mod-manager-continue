@@ -160,7 +160,7 @@
     <value>Mods:</value>
   </data>
   <data name="InstallMod_FileFilter" xml:space="preserve">
-    <value>Mod Archive (*.zip)|*.zip</value>
+    <value>Mod Archive (*.zip;*.rar;*.7z;*.tar;*.gz;*.bz2)|*.zip;*.rar;*.7z;*.tar;*.gz;*.bz2|All Files (*.*)|*.*</value>
   </data>
   <data name="InstallMod_DialogTitle" xml:space="preserve">
     <value>Install Mod...</value>
@@ -312,5 +312,58 @@ This will rename this mod's save-data folder under every profile, and update eve
   </data>
   <data name="OpenModFolderMenuItem_Text" xml:space="preserve">
     <value>_Open Containing Folder...</value>
+  </data>
+  <data name="ChangeModParentMenuItem_Text" xml:space="preserve">
+    <value>Change _Parent...</value>
+  </data>
+  <data name="ChangeModMainExecutableMenuItem_Text" xml:space="preserve">
+    <value>Change _Main Executable...</value>
+  </data>
+  <data name="ChangeModArgumentsMenuItem_Text" xml:space="preserve">
+    <value>Change Ar_guments...</value>
+  </data>
+  <data name="ChangeModCompatibilityMenuItem_Text" xml:space="preserve">
+    <value>Change Co_mpatibility Mode...</value>
+  </data>
+  <data name="ChangeModParent_Prompt" xml:space="preserve">
+    <value>Which mod should be the new parent? Choose "(None - this is a standalone/base mod)" to make this a root mod.</value>
+  </data>
+  <data name="ChangeModParent_Caption" xml:space="preserve">
+    <value>Change Parent...</value>
+  </data>
+  <data name="ChangeModMainExecutable_Prompt" xml:space="preserve">
+    <value>What is the mod's main executable (relative path from the mod's files, e.g. "game.exe")? Leave blank if this mod is data-only.</value>
+  </data>
+  <data name="ChangeModMainExecutable_Caption" xml:space="preserve">
+    <value>Change Main Executable...</value>
+  </data>
+  <data name="ChangeModArguments_Prompt" xml:space="preserve">
+    <value>What are the mod's launch arguments?</value>
+  </data>
+  <data name="ChangeModArguments_Caption" xml:space="preserve">
+    <value>Change Arguments...</value>
+  </data>
+  <data name="ChangeModCompatibility_Prompt" xml:space="preserve">
+    <value>What is the mod's Windows compatibility mode flags (e.g. "~ RUNASADMIN HIGHDPIAWARE")?</value>
+  </data>
+  <data name="ChangeModCompatibility_Caption" xml:space="preserve">
+    <value>Change Compatibility Mode...</value>
+  </data>
+  <data name="GameRunningWindow_Title" xml:space="preserve">
+    <value>Game is running...</value>
+  </data>
+  <data name="GameRunningWindow_Status" xml:space="preserve">
+    <value>The game is currently running. Mod Manager is waiting for it to exit.</value>
+  </data>
+  <data name="GameRunningWindow_Hint" xml:space="preserve">
+    <value>Only use the button below if the game has already exited but this window did not detect it. Otherwise, just close the game normally.</value>
+  </data>
+  <data name="GameRunningWindow_ForceUnlockButton" xml:space="preserve">
+    <value>_Force Unlock (only if the game already exited)</value>
+  </data>
+  <data name="GameRunningWindow_ConfirmForceUnlock" xml:space="preserve">
+    <value>Only continue if the game has ALREADY exited. This will forcibly terminate any remaining game processes, then Mod Manager will save profile data as usual and unlock. If the game is still running, you WILL lose unsaved progress.
+
+Are you sure the game has already exited?</value>
   </data>
 </root>

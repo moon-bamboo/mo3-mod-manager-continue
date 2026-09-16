@@ -170,6 +170,26 @@ namespace Mo3ModManager
             this.NodesDictionary[Node.ID] = Node;
         }
 
+        /// <summary>
+        /// Returns Node itself plus every descendant of it (recursively).
+        /// Used by the "change parent" feature to exclude invalid choices:
+        /// a mod can never become its own ancestor (that would make the tree
+        /// a cycle, which NodeTree's Parent/Childs model cannot represent),
+        /// so a mod's own subtree (including itself) must be excluded from
+        /// the list of candidate new parents.
+        /// </summary>
+        public IEnumerable<Node> GetNodeAndDescendants(Node Node)
+        {
+            yield return Node;
+            foreach (var child in Node.Childs)
+            {
+                foreach (var descendant in this.GetNodeAndDescendants(child))
+                {
+                    yield return descendant;
+                }
+            }
+        }
+
         public void RemoveNode(Node OldNode)
         {
             //only leaf node is allowed to be removed

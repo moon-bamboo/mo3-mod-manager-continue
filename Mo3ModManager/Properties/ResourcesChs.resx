@@ -148,7 +148,7 @@
     <value>再次确认</value>
   </data>
   <data name="InstallMod_FileFilter" xml:space="preserve">
-    <value>Mod 压缩包 (*.zip)|*.zip</value>
+    <value>Mod 压缩包 (*.zip;*.rar;*.7z;*.tar;*.gz;*.bz2)|*.zip;*.rar;*.7z;*.tar;*.gz;*.bz2|所有文件 (*.*)|*.*</value>
   </data>
   <data name="InstallMod_DialogTitle" xml:space="preserve">
     <value>安装 Mod...</value>
@@ -253,5 +253,58 @@
   </data>
   <data name="OpenModFolderMenuItem_Text" xml:space="preserve">
     <value>打开所在目录...(_O)</value>
+  </data>
+  <data name="ChangeModParentMenuItem_Text" xml:space="preserve">
+    <value>更改父 Mod...(_P)</value>
+  </data>
+  <data name="ChangeModMainExecutableMenuItem_Text" xml:space="preserve">
+    <value>更改主程序...(_M)</value>
+  </data>
+  <data name="ChangeModArgumentsMenuItem_Text" xml:space="preserve">
+    <value>更改启动参数...(_G)</value>
+  </data>
+  <data name="ChangeModCompatibilityMenuItem_Text" xml:space="preserve">
+    <value>更改兼容模式...(_M)</value>
+  </data>
+  <data name="ChangeModParent_Prompt" xml:space="preserve">
+    <value>哪个 Mod 应该作为新的父 Mod？选择"（无 - 这是一个独立/基础 Mod）"可以让这个 Mod 变成根节点。</value>
+  </data>
+  <data name="ChangeModParent_Caption" xml:space="preserve">
+    <value>更改父 Mod...</value>
+  </data>
+  <data name="ChangeModMainExecutable_Prompt" xml:space="preserve">
+    <value>Mod 的主程序是什么（相对于 Mod 文件的路径，例如 "game.exe"）？如果此 Mod 只是数据补丁，可以留空。</value>
+  </data>
+  <data name="ChangeModMainExecutable_Caption" xml:space="preserve">
+    <value>更改主程序...</value>
+  </data>
+  <data name="ChangeModArguments_Prompt" xml:space="preserve">
+    <value>Mod 的启动参数是什么？</value>
+  </data>
+  <data name="ChangeModArguments_Caption" xml:space="preserve">
+    <value>更改启动参数...</value>
+  </data>
+  <data name="ChangeModCompatibility_Prompt" xml:space="preserve">
+    <value>Mod 的 Windows 兼容模式标志是什么（例如 "~ RUNASADMIN HIGHDPIAWARE"）？</value>
+  </data>
+  <data name="ChangeModCompatibility_Caption" xml:space="preserve">
+    <value>更改兼容模式...</value>
+  </data>
+  <data name="GameRunningWindow_Title" xml:space="preserve">
+    <value>游戏正在运行中...</value>
+  </data>
+  <data name="GameRunningWindow_Status" xml:space="preserve">
+    <value>游戏正在运行中，Mod 管理器正在等待游戏退出。</value>
+  </data>
+  <data name="GameRunningWindow_Hint" xml:space="preserve">
+    <value>仅当游戏已经退出但本窗口未能检测到时，才使用下方按钮。否则请正常关闭游戏。</value>
+  </data>
+  <data name="GameRunningWindow_ForceUnlockButton" xml:space="preserve">
+    <value>强制解锁（仅在游戏已退出时使用）(_F)</value>
+  </data>
+  <data name="GameRunningWindow_ConfirmForceUnlock" xml:space="preserve">
+    <value>只有在游戏已经退出的情况下才能继续。此操作会强制结束所有残留的游戏进程，之后 Mod 管理器会照常保存配置数据并解锁。如果游戏仍在运行，你将会丢失未保存的进度。
+
+请确认游戏是否已经退出？</value>
   </data>
 </root>

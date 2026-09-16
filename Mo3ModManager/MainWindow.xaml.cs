@@ -173,6 +173,15 @@ namespace Mo3ModManager
             renameMenuItem.Header = Properties.Resources.RenameModMenuItem_Text;
             var changeIdMenuItem = (MenuItem)modContextMenu.Items[3];
             changeIdMenuItem.Header = Properties.Resources.ChangeModIdMenuItem_Text;
+            var changeParentMenuItem = (MenuItem)modContextMenu.Items[4];
+            changeParentMenuItem.Header = Properties.Resources.ChangeModParentMenuItem_Text;
+            var changeMainExecutableMenuItem = (MenuItem)modContextMenu.Items[5];
+            changeMainExecutableMenuItem.Header = Properties.Resources.ChangeModMainExecutableMenuItem_Text;
+            var changeArgumentsMenuItem = (MenuItem)modContextMenu.Items[6];
+            changeArgumentsMenuItem.Header = Properties.Resources.ChangeModArgumentsMenuItem_Text;
+            var changeCompatibilityMenuItem = (MenuItem)modContextMenu.Items[7];
+            changeCompatibilityMenuItem.Header = Properties.Resources.ChangeModCompatibilityMenuItem_Text;
+            // Items[8] is a Separator, not a MenuItem.
             // ToggleHideModMenuItem's text is set dynamically in
             // ModItemContextMenu_Opened (it depends on the selected mod's
             // hidden state), so it's intentionally not set here.
@@ -373,9 +382,24 @@ namespace Mo3ModManager
             this.IsEnabled = false;
             this.IsCloseButtonEnabled = false;
 
+            // Shown only on the Win8+ path (see below): a manual, last-resort
+            // escape hatch for the rare case where the normal exit-detection
+            // mechanism (Job Object completion port) never fires because some
+            // descendant process escaped the job. Not used on the legacy
+            // Win7 path, which has no Job Object to force-terminate and
+            // doesn't block the UI thread indefinitely in the first place
+            // (it relies on a fixed Sleep + manual confirmation instead).
+            GameRunningWindow gameRunningWindow = null;
+
             ModProcessManager modProcessManager = new ModProcessManager(arguments);
             modProcessManager.RunWorkerCompleted += (object worker_sender, System.ComponentModel.RunWorkerCompletedEventArgs worker_e) =>
              {
+                 if (gameRunningWindow != null)
+                 {
+                     gameRunningWindow.CloseProgrammatically();
+                     gameRunningWindow = null;
+                 }
+
                  this.IsEnabled = true;
                  this.IsCloseButtonEnabled = true;
 
@@ -416,6 +440,30 @@ namespace Mo3ModManager
             else
             {
                 //OS >=Win8
+                gameRunningWindow = new GameRunningWindow(this);
+                gameRunningWindow.ForceUnlockRequested += (s, args) =>
+                {
+                    // TryForceTerminate makes the existing wait loop in
+                    // ModProcessManager observe the job's active process
+                    // count reaching zero, so it returns normally and
+                    // RunStep3_Clean still runs afterwards -- this is why
+                    // force-terminating is safe for save data, unlike the
+                    // user killing the whole Mod Manager process themselves.
+                    bool terminated = modProcessManager.TryForceTerminate();
+                    if (!terminated)
+                    {
+                        // Nothing to terminate (e.g. the game had already
+                        // exited normally between the user opening this
+                        // window and clicking the button, and
+                        // RunWorkerCompleted just hasn't been dispatched to
+                        // the UI thread yet) -- there is nothing more to do
+                        // here; RunWorkerCompleted will close this window on
+                        // its own shortly.
+                        System.Diagnostics.Trace.WriteLine("[Note] Force-unlock requested, but there was no active job to terminate.");
+                    }
+                };
+                gameRunningWindow.Show();
+
                 modProcessManager.RunAsync();
             }
 
@@ -583,7 +631,7 @@ namespace Mo3ModManager
             // reachable via generated fields; look it up by resource key and
             // item index instead.
             var modContextMenu = (ContextMenu)sender;
-            var toggleHideMenuItem = (MenuItem)modContextMenu.Items[4];
+            var toggleHideMenuItem = (MenuItem)modContextMenu.Items[9];
 
             bool isHidden = this.DisplayState.IsHidden(selectedItem.Node.ID);
             toggleHideMenuItem.Header = isHidden ? Properties.Resources.UnhideModMenuItem_Text : Properties.Resources.HideModMenuItem_Text;
@@ -644,7 +692,7 @@ namespace Mo3ModManager
             var selectedItem = this.ModTreeView.SelectedItem as ModItem;
             if (selectedItem == null) return;
 
-            string newName = InputWindow.ShowDialog(this, Properties.Resources.RenameMod_Prompt, Properties.Resources.RenameMod_Caption);
+            string newName = InputWindow.ShowDialog(this, Properties.Resources.RenameMod_Prompt, Properties.Resources.RenameMod_Caption, selectedItem.Node.Name);
             if (String.IsNullOrWhiteSpace(newName)) return;
             newName = newName.Trim();
 
@@ -733,6 +781,134 @@ namespace Mo3ModManager
             }
         }
 
+        private void ChangeModParentMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedItem = this.ModTreeView.SelectedItem as ModItem;
+            if (selectedItem == null) return;
+
+            var node = selectedItem.Node;
+
+            // A mod can never become its own ancestor -- exclude it and its
+            // entire existing subtree from the candidate list, so the choice
+            // of parent is guaranteed acyclic by construction rather than
+            // needing a runtime cycle check.
+            var excluded = new HashSet<Node>(this.NodeTree.GetNodeAndDescendants(node));
+            var candidates = this.NodeTree.NodesDictionary.Values.Where(n => !excluded.Contains(n));
+
+            var dialog = new SelectParentWindow(this, Properties.Resources.ChangeModParent_Prompt, Properties.Resources.ChangeModParent_Caption, candidates, node.ParentID);
+            if (dialog.ShowDialog() != true) return;
+
+            string newParentID = dialog.SelectedParentID;
+            if (newParentID == node.ParentID) return;
+
+            try
+            {
+                // Detach from the old parent (or RootNodes, if it was a root
+                // mod) before attaching to the new one, mirroring how
+                // NodeTree.RemoveNode/BuildTree maintain Parent/Childs/RootNodes.
+                if (node.Parent != null)
+                {
+                    node.Parent.Childs.Remove(node);
+                }
+                else
+                {
+                    this.NodeTree.RootNodes.Remove(node);
+                }
+
+                node.ParentID = newParentID;
+                if (String.IsNullOrEmpty(newParentID))
+                {
+                    node.Parent = null;
+                    this.NodeTree.RootNodes.Add(node);
+                }
+                else
+                {
+                    node.Parent = this.NodeTree.NodesDictionary[newParentID];
+                    node.Parent.Childs.Add(node);
+                }
+
+                node.Write(node.Directory);
+
+                // The mod's position in the tree changed, so a full rebuild
+                // (rather than an in-place UI update) is the simplest way to
+                // get the TreeView structure correct.
+                string modIDToRestore = node.ID;
+                this.suppressSelectionPersistence = true;
+                try
+                {
+                    this.BuildTreeView();
+                    this.SelectModByID(modIDToRestore);
+                }
+                finally
+                {
+                    this.suppressSelectionPersistence = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, Properties.Resources.Dialog_Title_Error, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void ChangeModMainExecutableMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedItem = this.ModTreeView.SelectedItem as ModItem;
+            if (selectedItem == null) return;
+
+            string newValue = InputWindow.ShowDialog(this, Properties.Resources.ChangeModMainExecutable_Prompt, Properties.Resources.ChangeModMainExecutable_Caption, selectedItem.Node.MainExecutable);
+            // Unlike Name/ID, an empty value is valid here (it means "this mod
+            // has no executable of its own, e.g. a data-only patch"), so don't
+            // treat String.IsNullOrWhiteSpace as "user cancelled". InputWindow
+            // returns String.Empty for both "cancelled" and "cleared the box
+            // and confirmed", which are indistinguishable here; that's an
+            // acceptable ambiguity since clearing this particular field is a
+            // legitimate thing to want to do.
+            try
+            {
+                selectedItem.Node.MainExecutable = newValue.Trim();
+                selectedItem.Node.Write(selectedItem.Node.Directory);
+                this.UpdateRunButtonStatus();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, Properties.Resources.Dialog_Title_Error, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void ChangeModArgumentsMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedItem = this.ModTreeView.SelectedItem as ModItem;
+            if (selectedItem == null) return;
+
+            string newValue = InputWindow.ShowDialog(this, Properties.Resources.ChangeModArguments_Prompt, Properties.Resources.ChangeModArguments_Caption, selectedItem.Node.Arguments);
+            try
+            {
+                selectedItem.Node.Arguments = newValue.Trim();
+                selectedItem.Node.Write(selectedItem.Node.Directory);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, Properties.Resources.Dialog_Title_Error, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void ChangeModCompatibilityMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedItem = this.ModTreeView.SelectedItem as ModItem;
+            if (selectedItem == null) return;
+
+            string newValue = InputWindow.ShowDialog(this, Properties.Resources.ChangeModCompatibility_Prompt, Properties.Resources.ChangeModCompatibility_Caption, selectedItem.Node.Compatibility);
+            try
+            {
+                selectedItem.Node.Compatibility = newValue.Trim();
+                selectedItem.Node.Write(selectedItem.Node.Directory);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, Properties.Resources.Dialog_Title_Error, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
         private void AboutButton_MouseEnter(object sender, MouseEventArgs e)
         {
             // Mutate the existing AccessText's Text property rather than
@@ -798,13 +974,11 @@ namespace Mo3ModManager
                 string incomingDirectory = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Incoming");
                 try
                 {
-                    var fastZip = new ICSharpCode.SharpZipLib.Zip.FastZip();
-
-                    // Will always overwrite if target filenames already exist
-                    fastZip.ExtractZip(
-                        openFileDialog.FileName,
-                        incomingDirectory,
-                        String.Empty);
+                    // Auto-detects the archive format (zip, rar, 7z, tar, and
+                    // others) from its contents rather than requiring zip
+                    // specifically -- most mod archives found in the wild use
+                    // whatever format their author happened to use.
+                    IO.ExtractArchive(openFileDialog.FileName, incomingDirectory);
 
                     // Read-only check: verifies the archive's mods could be merged into
                     // the current tree (no duplicate/unresolvable IDs) without actually

@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using SharpCompress.Archives;
+using SharpCompress.Common;
 
 namespace Mo3ModManager
 {
@@ -19,6 +21,56 @@ namespace Mo3ModManager
                 Filename = Filename.Replace(c.ToString(), "_");
             }
             return Filename;
+        }
+
+        /// <summary>
+        /// Extracts an archive (zip, rar, 7z, tar, and other formats
+        /// SharpCompress can read) to the given directory, auto-detecting the
+        /// format from the file's contents rather than its extension. Used by
+        /// the "Install Mod..." flow so users aren't limited to zip archives,
+        /// which is what most mod archives found in the wild actually use,
+        /// but far from the only format in circulation.
+        /// </summary>
+        /// <param name="ArchiveFilePath">Path to the archive file.</param>
+        /// <param name="DestinationDirectory">The directory to extract into. Created if it doesn't already exist.</param>
+        public static void ExtractArchive(string ArchiveFilePath, string DestinationDirectory)
+        {
+            Directory.CreateDirectory(DestinationDirectory);
+
+            // Resolve to a full path with a trailing separator so the
+            // "escapes the destination" check below (a defense against
+            // zip-slip-style path traversal, where an archive entry's name
+            // contains "..\" segments to write outside the intended folder)
+            // can rely on a simple prefix comparison.
+            string destinationFullPath = Path.GetFullPath(DestinationDirectory);
+            if (!destinationFullPath.EndsWith(Path.DirectorySeparatorChar.ToString()))
+            {
+                destinationFullPath += Path.DirectorySeparatorChar;
+            }
+
+            using (var archive = SharpCompress.Archives.ArchiveFactory.Open(ArchiveFilePath))
+            {
+                foreach (var entry in archive.Entries)
+                {
+                    if (entry.IsDirectory) continue;
+
+                    // entry.Key uses '/' as the separator regardless of the
+                    // host OS (this is how these archive formats store paths
+                    // internally); normalize before combining with a Windows
+                    // destination path.
+                    string entryKey = entry.Key ?? string.Empty;
+                    string relativePath = entryKey.Replace('/', Path.DirectorySeparatorChar);
+                    string destinationFile = Path.GetFullPath(Path.Combine(destinationFullPath, relativePath));
+
+                    if (!destinationFile.StartsWith(destinationFullPath, StringComparison.OrdinalIgnoreCase))
+                    {
+                        throw new Exception("Archive entry \"" + entryKey + "\" would extract outside of the destination folder. This archive may be malformed or malicious; installation aborted.");
+                    }
+
+                    Directory.CreateDirectory(Path.GetDirectoryName(destinationFile));
+                    entry.WriteToFile(destinationFile, new SharpCompress.Common.ExtractionOptions { Overwrite = true, PreserveFileTime = true });
+                }
+            }
         }
 
         /// <summary>
