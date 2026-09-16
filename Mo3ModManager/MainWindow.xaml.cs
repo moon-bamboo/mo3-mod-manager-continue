@@ -525,6 +525,8 @@ namespace Mo3ModManager
         private void NewProfileButton_Click(object sender, RoutedEventArgs e)
         {
             string newProfileName = InputWindow.ShowDialog(this, Properties.Resources.NewProfile_Prompt, Properties.Resources.NewProfile_Caption);
+            // null == cancelled: don't touch the filesystem at all.
+            if (newProfileName == null) return;
             newProfileName = IO.PurifyFileName(newProfileName);
 
             if (String.IsNullOrWhiteSpace(newProfileName)) return;
@@ -552,6 +554,8 @@ namespace Mo3ModManager
 
 
             string newProfileName = InputWindow.ShowDialog(this, Properties.Resources.NewProfile_Prompt, Properties.Resources.NewProfile_Caption);
+            // null == cancelled: don't touch the filesystem at all.
+            if (newProfileName == null) return;
             newProfileName = IO.PurifyFileName(newProfileName);
 
             if (String.IsNullOrWhiteSpace(newProfileName)) return;
@@ -856,13 +860,12 @@ namespace Mo3ModManager
             if (selectedItem == null) return;
 
             string newValue = InputWindow.ShowDialog(this, Properties.Resources.ChangeModMainExecutable_Prompt, Properties.Resources.ChangeModMainExecutable_Caption, selectedItem.Node.MainExecutable);
-            // Unlike Name/ID, an empty value is valid here (it means "this mod
-            // has no executable of its own, e.g. a data-only patch"), so don't
-            // treat String.IsNullOrWhiteSpace as "user cancelled". InputWindow
-            // returns String.Empty for both "cancelled" and "cleared the box
-            // and confirmed", which are indistinguishable here; that's an
-            // acceptable ambiguity since clearing this particular field is a
-            // legitimate thing to want to do.
+            // A null return means the user cancelled (Cancel button, Esc, or the
+            // title bar's close button): leave the field untouched. An empty
+            // string, by contrast, is a legitimate value here (it means "this
+            // mod has no executable of its own, e.g. a data-only patch"), so it
+            // must be applied rather than mistaken for a cancellation.
+            if (newValue == null) return;
             try
             {
                 selectedItem.Node.MainExecutable = newValue.Trim();
@@ -881,6 +884,8 @@ namespace Mo3ModManager
             if (selectedItem == null) return;
 
             string newValue = InputWindow.ShowDialog(this, Properties.Resources.ChangeModArguments_Prompt, Properties.Resources.ChangeModArguments_Caption, selectedItem.Node.Arguments);
+            // null == cancelled; an empty string is a valid value (no arguments).
+            if (newValue == null) return;
             try
             {
                 selectedItem.Node.Arguments = newValue.Trim();
@@ -898,6 +903,9 @@ namespace Mo3ModManager
             if (selectedItem == null) return;
 
             string newValue = InputWindow.ShowDialog(this, Properties.Resources.ChangeModCompatibility_Prompt, Properties.Resources.ChangeModCompatibility_Caption, selectedItem.Node.Compatibility);
+            // null == cancelled; an empty string is a valid value (no
+            // compatibility flags applied).
+            if (newValue == null) return;
             try
             {
                 selectedItem.Node.Compatibility = newValue.Trim();

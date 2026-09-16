@@ -13,9 +13,13 @@ namespace Mo3ModManager
     {
         /// <summary>
         /// Replaces any character invalid in a Windows file/folder name with "_".
+        /// A null input (e.g. a cancelled input dialog) yields an empty string
+        /// rather than throwing.
         /// </summary>
         public static string PurifyFileName(string Filename)
         {
+            if (String.IsNullOrEmpty(Filename)) return Filename ?? String.Empty;
+
             foreach (char c in System.IO.Path.GetInvalidFileNameChars())
             {
                 Filename = Filename.Replace(c.ToString(), "_");

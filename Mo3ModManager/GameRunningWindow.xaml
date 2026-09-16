@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         FontSize="14"
         Title="Game is running..." Height="160" Width="360" ShowInTaskbar="True"
-        WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Topmost="True"
+        WindowStartupLocation="CenterScreen" ResizeMode="NoResize"
         Closing="Window_Closing">
     <Grid Margin="10">
         <Grid.RowDefinitions>
