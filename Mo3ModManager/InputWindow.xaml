@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Mo3ModManager"
         mc:Ignorable="d"
         FontSize="14"
-        Title="InputWindow" Height="120" Width="240" MinHeight="120" MinWidth="240" ShowInTaskbar="False" WindowStartupLocation="CenterOwner" ResizeMode="CanResize">
+        Title="InputWindow" Height="180" Width="360" MinHeight="120" MinWidth="240" ShowInTaskbar="False" WindowStartupLocation="CenterOwner" ResizeMode="CanResize">
     <Grid Margin="4" FocusManager.FocusedElement="{Binding ElementName=TextBox}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />

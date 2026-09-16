@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Mo3ModManager"
         mc:Ignorable="d"
         FontSize="14"
-        Title="Change Parent..." Height="160" Width="320" MinHeight="160" MinWidth="320" ShowInTaskbar="False" WindowStartupLocation="CenterOwner" ResizeMode="CanResize">
+        Title="Change Parent..." Height="160" Width="480" MinHeight="160" MinWidth="320" ShowInTaskbar="False" WindowStartupLocation="CenterOwner" ResizeMode="CanResize">
     <Grid Margin="8" FocusManager.FocusedElement="{Binding ElementName=ParentComboBox}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
